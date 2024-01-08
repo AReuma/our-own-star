@@ -1,12 +1,12 @@
 <template>
   <div id="main-layout">
-    <div class="w-11/12 h-48 border-b border-slate-300 m-auto flex flex-col items-center">
+    <div id="main-title">
       <div id="main-title-content">
         <div id="top-title">
           우리 모두가 사랑하는 <span class="text-pink">아이돌</span>과 함께하는
         </div>
         <div id="title">
-          'Our Own Start'!
+          'Our Own Star'!
         </div>
       </div>
     </div>
@@ -24,16 +24,22 @@
     </div>
 
     <div id="start-btn">
-      <v-btn id="my-btn">내 아이돌 찾기</v-btn>
+      <v-btn id="my-btn" @click="moveMyIdol">내 아이돌 찾기</v-btn>
     </div>
   </div>
 </template>
 
 <script>
 import {defineComponent} from 'vue'
+import router from "@/router";
 
 export default defineComponent({
-  name: "MainPageView"
+  name: "MainPageView",
+  methods: {
+    moveMyIdol(){
+      router.push({name: "LoginView"})
+    }
+  }
 })
 </script>
 
@@ -43,19 +49,19 @@ export default defineComponent({
   height: 100vh;
   background: #F0F0F0;
   padding: 80px 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 #main-title{
   display: flex;
-  width: 1312px;
-  padding: 58px 199px 41px 199px;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
+  margin-bottom: 32px;
 }
 #main-title-content{
   display: flex;
-  width: 906px;
-  height: 122px;
   padding-top: 26px;
   flex-direction: column;
   justify-content: flex-end;
@@ -94,10 +100,9 @@ export default defineComponent({
 }
 #main-info {
   display: flex;
-  width: 1312px;
-  height: 220px;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   flex-shrink: 0;
   color: #000;
   text-align: center;
@@ -108,7 +113,6 @@ export default defineComponent({
 }
 #main-content-1{
   display: inline-flex;
-  padding: 22px 250px;
   align-items: center;
   color: #000;
   text-align: center;
