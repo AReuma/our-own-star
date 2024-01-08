@@ -9,6 +9,7 @@ const OurOwnStar = {
     dark: false,
     colors: {
         pink: '#FF1493',
+        blue: '#3498DB'
     }
 }
 

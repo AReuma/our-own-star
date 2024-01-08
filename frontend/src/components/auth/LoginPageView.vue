@@ -47,6 +47,7 @@
 
 <script>
 import {defineComponent} from 'vue'
+import router from "@/router";
 
 export default defineComponent({
   name: "LoginPageView",
@@ -57,7 +58,7 @@ export default defineComponent({
   },
   methods: {
     moveJoin(){
-
+      router.push({name: 'RegisterView'})
     },
     moveFindUser(){
 
