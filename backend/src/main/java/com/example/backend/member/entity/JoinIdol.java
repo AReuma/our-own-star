@@ -15,6 +15,8 @@ public class JoinIdol {
     @Column(name = "join_idol_id")
     private Long id;
 
+    private String nickname;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;

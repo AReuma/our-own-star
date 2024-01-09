@@ -19,12 +19,11 @@ public class Member extends TimeStamped {
 
     private String password;
 
-    private String nickname;
+    private String phoneNum;
 
     @Enumerated(EnumType.STRING)
     private Auth role;
 
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
-
 }
