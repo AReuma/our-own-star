@@ -34,7 +34,7 @@ public class ExceptionManager {
         log.error(e.getErrorCode().name());
 
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
-                .body(new ErrorDTO(e.getErrorCode().getHttpStatus().value(), e.getErrorCode().getMessage(), e.getErrorCode().getHttpStatus().getReasonPhrase()));
+                .body(new ErrorDTO(e.getErrorCode().getHttpStatus().value(), e.getErrorCode().name(), e.getErrorCode().getHttpStatus().getReasonPhrase()));
     }
 
     @ExceptionHandler(RuntimeException.class)
