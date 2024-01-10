@@ -14,6 +14,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -31,6 +33,7 @@ public class SecurityConfig {
                 authorizeRequests
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/register")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/login")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/checkUsername/**")).permitAll()
                         .anyRequest().hasAuthority("USER")
         )
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // session 말고 jwt 사용
@@ -45,7 +48,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOrigin("*");
+        configuration.addAllowedOriginPattern("*");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
