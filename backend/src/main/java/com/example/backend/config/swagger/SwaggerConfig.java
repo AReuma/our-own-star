@@ -2,12 +2,10 @@ package com.example.backend.config.swagger;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@RequiredArgsConstructor
 public class SwaggerConfig {
 // http://localhost:7777/swagger-ui/index.html
     @Bean

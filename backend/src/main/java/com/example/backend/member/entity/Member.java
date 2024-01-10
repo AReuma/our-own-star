@@ -15,9 +15,11 @@ public class Member extends TimeStamped {
     @Column(name = "member_id")
     private Long id;
 
-    private String userId;
+    private String username;
 
     private String password;
+
+    private String nickname;
 
     private String phoneNum;
 
