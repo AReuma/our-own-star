@@ -36,7 +36,10 @@ dependencies {
 	// Spring Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	// ar jwt
+	// mail
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	// jwt
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3' // 최신 버전 확인
 	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3' // 최신 버전 확인
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3' // 최신 버전 확인

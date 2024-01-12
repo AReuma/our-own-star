@@ -15,6 +15,7 @@ public enum ErrorCode {
     NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, ""),
     UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, ""),
     NOT_FOUND_BOARD(HttpStatus.NOT_FOUND, ""),
+    EMAIL_SEND_FAIL(HttpStatus.CONFLICT, ""),
     ;
 
     private final HttpStatus httpStatus;
