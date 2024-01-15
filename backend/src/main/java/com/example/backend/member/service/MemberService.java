@@ -12,4 +12,6 @@ public interface MemberService {
     ResponseEntity<Boolean> checkUsername(String username);
 
     ResponseEntity<String> emailCertification(EmailCertificationRequestDTO dto);
+
+    ResponseEntity<Boolean> emailCertificationCode(String username, String code);
 }

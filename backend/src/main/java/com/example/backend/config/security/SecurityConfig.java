@@ -1,6 +1,5 @@
 package com.example.backend.config.security;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +12,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -33,6 +30,7 @@ public class SecurityConfig {
                 authorizeRequests
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/register")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/login")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/checkUsername/**")).permitAll()
                         .anyRequest().hasAuthority("USER")
         )

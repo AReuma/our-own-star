@@ -53,6 +53,13 @@ public class MemberController {
 
     @PostMapping("/email-certification")
     public ResponseEntity<String> emailCertification(@RequestBody @Valid EmailCertificationRequestDTO emailCertificationRequestDTO){
+        log.info("emailCertification");
         return memberService.emailCertification(emailCertificationRequestDTO);
+    }
+
+    @PostMapping("/email-certification/code")
+    public ResponseEntity<Boolean> emailCertificationCode(@RequestBody @Valid EmailCertificationCodeRequestDTO emailCertificationCodeRequestDTO){
+        log.info("emailCertificationCode");
+        return memberService.emailCertificationCode(emailCertificationCodeRequestDTO.getUsername(), emailCertificationCodeRequestDTO.getCode());
     }
 }

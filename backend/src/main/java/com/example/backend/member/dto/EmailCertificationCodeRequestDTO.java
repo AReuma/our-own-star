@@ -9,9 +9,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmailCertificationRequestDTO {
+public class EmailCertificationCodeRequestDTO {
 
     @Email
     @NotBlank
     private String username;
+
+    @NotBlank
+    private String code;
 }
