@@ -1,9 +1,5 @@
 <template>
-  <div>
-    <h1>OAuth Response</h1>
-    <p>Access Token: {{ accessToken }}</p>
-    <p>Refresh Token: {{ refreshToken }}</p>
-  </div>
+  <div></div>
 </template>
 
 <script>
