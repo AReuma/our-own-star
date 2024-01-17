@@ -31,7 +31,7 @@ public class MemberInitDB {
 
             Member user = Member.builder()
                     .username("dkfma1@naver.com")
-                    .password(passwordEncoder.encode("dkfmaPassword1"))
+                    .password(passwordEncoder.encode("dkfmaPassword1!"))
                     .nickname("니니꿍")
                     .phoneNum("01012341234")
                     .role(Auth.ROLE_USER)

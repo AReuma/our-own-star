@@ -18,7 +18,7 @@ public class LoginRequestDTO {
     private String username;
 
     @NotBlank(message = "PASSWORD cannot be blank")
-    @Pattern(regexp="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,15}$", message="비밀번호는 8자 이상 15자 이하이며 대문자, 소문자, 숫자를 모두 포함해야 합니다.")
+    @Pattern(regexp="^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,}$", message="비밀번호는 8자 이상 15자 이하이며 대문자, 소문자, 숫자를 모두 포함해야 합니다.")
     @Schema(description = "비밀번호", example = "exPassword1")
     private String password;
 }

@@ -49,6 +49,12 @@ public class MemberServiceImpl implements MemberService{
     @Transactional
     @Override
     public ResponseEntity<String> register(String username, String password, String nickname, String phoneNum) {
+
+        memberRepository.findByUsername(username)
+                .ifPresent(member -> { throw new AppException(ErrorCode.USER_DUPLICATED, "중복된 아이디입니다.");});
+        memberRepository.findByPhoneNum(phoneNum)
+                .ifPresent(member -> { throw new AppException(ErrorCode.USER_DUPLICATED, "이미 사용한 전화번호입니다.");});
+
         Member member = Member.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
@@ -66,7 +72,7 @@ public class MemberServiceImpl implements MemberService{
     public ResponseEntity<Boolean> checkUsername(String username) {
         memberRepository.findByUsername(username)
                 .ifPresent(member -> {
-                    throw new AppException(ErrorCode.USER_DUPLICATED, Boolean.FALSE.toString());
+                    throw new AppException(ErrorCode.USER_DUPLICATED, "사용 불가능한 아이디입니다.");
                 });
 
         return ResponseEntity.ok().body(Boolean.TRUE);
@@ -78,7 +84,7 @@ public class MemberServiceImpl implements MemberService{
         String username = dto.getUsername();
 
         boolean isExistId = memberRepository.existsByUsername(username);
-        if (isExistId) throw new AppException(ErrorCode.USER_DUPLICATED, "INVALID USER");
+        if (isExistId) throw new AppException(ErrorCode.USER_DUPLICATED, "사용 불가능한 아이디입니다.");
 
         // 인증코드
         String certificationNumber = getCertificationNumber();
