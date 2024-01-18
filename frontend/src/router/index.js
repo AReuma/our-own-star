@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import LoginView from "@/views/auth/LoginView.vue";
 import RegisterView from "@/views/auth/RegisterView.vue";
 import OAuthView from "@/views/auth/OAuthView.vue";
+import MainView from "@/views/main/MainView.vue";
 
 const routes = [
   {
@@ -12,6 +13,11 @@ const routes = [
   },
   {
     path: '/our-own-star',
+    name: 'MainView',
+    component: MainView
+  },
+  {
+    path: '/our-own-star/login',
     name: 'LoginView',
     component: LoginView
   },

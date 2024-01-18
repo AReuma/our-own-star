@@ -14,6 +14,7 @@ import {API_BASE_URL} from "@/constant/ApiUrl/ApiUrl";
 import {VueCookieNext} from 'vue-cookie-next';
 import {ACCESS_TOKEN_EXPIRE} from "@/constant/jwt/JwtUtil";
 import {ParsingInfo} from "@/constant/jwt/JwtParser";
+import router from "@/router";
 
 export default defineComponent({
   name: "LoginView",
@@ -27,7 +28,6 @@ export default defineComponent({
   methods: {
     login(payload){
       const {username, password} = payload
-
       axios.post(API_BASE_URL+"/api/v1/users/login", {username, password})
           .then((res) => {
             this.accessToken = res.data.accesstoken;
@@ -39,7 +39,10 @@ export default defineComponent({
             VueCookieNext.setCookie('accessToken', this.accessToken, ACCESS_TOKEN_EXPIRE);
             VueCookieNext.setCookie('refreshToken', this.refreshToken, ACCESS_TOKEN_EXPIRE);
 
-            ParsingInfo(this.accessToken)
+            ParsingInfo(this.accessToken).then(() => {
+              console.log('test')
+              router.push({name: 'MainView'})
+            })
 
           })
           .catch((err) => {
