@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomOAuth2User implements OAuth2User {
+public class CustomOAuth2User implements OAuth2User, UserDetails {
 
     private Member member;
     private Map<String, Object> attributes;
@@ -34,12 +35,37 @@ public class CustomOAuth2User implements OAuth2User {
     }
 
     @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
     public String getName() {
         return member.getNickname();
     }
 
     public String getUsername(){
         return member.getUsername();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 
     public String getRole(){

@@ -18,8 +18,8 @@ public class JWTUtil {
 
     private SecretKey accessTokenSecretKey;
     private SecretKey refreshTokenSecretKey;
-    private final Long accessExpireTimeMs = 1000 * 60l * 5; // 5분
-    private final Long refreshExpireTimeMs = 1000 * 60l * 10; // 10분
+    private final Long accessExpireTimeMs = 1000 * 60l * 20; // 5분
+    private final Long refreshExpireTimeMs = 1000 * 60l * 30; // 10분
 
     public JWTUtil(@Value("${jwt.accessToken.secretKey}")String accessSecret, @Value("${jwt.refreshToken.secretKey}")String refreshSecret){
         accessTokenSecretKey = new SecretKeySpec(accessSecret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
@@ -54,7 +54,7 @@ public class JWTUtil {
     }
 
     public Claims parseToken(String token, SecretKey secretKey){
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+        return  Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
     }
 
     public Claims parseAccessToken(String token){
