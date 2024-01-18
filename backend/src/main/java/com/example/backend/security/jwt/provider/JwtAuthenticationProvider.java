@@ -1,5 +1,6 @@
 package com.example.backend.security.jwt.provider;
 
+import com.example.backend.member.dto.LoginInfoDto;
 import com.example.backend.security.jwt.JWTUtil;
 import com.example.backend.security.jwt.token.JwtAuthenticationToken;
 import io.jsonwebtoken.Claims;
@@ -30,17 +31,27 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
         Claims claims = jwtUtil.parseAccessToken(authenticationToken.getToken());
 
-        String username = claims.getSubject();
+        String username = claims.get("username", String.class);
+        String nickname = claims.get("nickname", String.class);
+
         List<GrantedAuthority> authorities = getGrantedAuthorities(claims);
 
-        return new JwtAuthenticationToken(authorities, username, null);
+        return new JwtAuthenticationToken(authorities, new LoginInfoDto(username, nickname), null);
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(Claims claims){
-        List<String> roles = (List<String>) claims.get("role");
+        Object rolesObject = claims.get("role");
 
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(() -> roles.get(0));
+
+        if (rolesObject instanceof String) {
+            // "role" 클레임이 단일 값인 경우
+            authorities.add(() -> (String) rolesObject);
+        } else if (rolesObject instanceof List) {
+            // "role" 클레임이 리스트인 경우
+            List<String> roles = (List<String>) rolesObject;
+            authorities.add(() -> roles.get(0));
+        }
 
         return authorities;
     }

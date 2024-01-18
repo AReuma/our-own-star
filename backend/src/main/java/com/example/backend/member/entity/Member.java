@@ -3,7 +3,6 @@ package com.example.backend.member.entity;
 import com.example.backend.common.TimeStamped;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -35,4 +34,16 @@ public class Member extends TimeStamped {
 
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
+
+    public static Member createMember(String username, String password, String nickname, String phoneNum, SocialType socialType){
+
+        return Member.builder()
+                .username(username)
+                .password(password)
+                .nickname(nickname)
+                .phoneNum(phoneNum)
+                .role(Auth.ROLE_USER)
+                .socialType(socialType)
+                .build();
+    }
 }

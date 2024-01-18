@@ -5,15 +5,16 @@
     </div>
 
     <div id="sns-login">
-      <div id="kakao-login-btn"></div>
-      <div id="google-login-btn"></div>
-      <div id="github-login-btn"></div>
+      <div @click="kakaoBtn" id="kakao-login-btn"></div>
+      <div @click="googleBtn" id="google-login-btn"></div>
+      <div @click="naverBtn" id="naver-login-btn"></div>
     </div>
 
     <div id="login-form">
       <div id="login-field">
         <div></div>
         <v-text-field
+            v-model="username"
             density="compact"
             placeholder="아이디"
             prepend-inner-icon="mdi-email-outline"
@@ -21,6 +22,7 @@
             variant="outlined"
         ></v-text-field>
         <v-text-field
+            v-model="password"
             density="compact"
             :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
             :type="visible ? 'text' : 'password'"
@@ -29,11 +31,12 @@
             variant="outlined"
             @click:append-inner="visible = !visible"
             style="min-height: 42px; text-align: center; line-height: 42px;"
+            @keydown.enter="login()"
         ></v-text-field>
 
       </div>
       <div>
-        <v-btn id="login-btn">로그인</v-btn>
+        <v-btn @click="login" id="login-btn">로그인</v-btn>
       </div>
     </div>
     <div id="find-user">
@@ -48,12 +51,15 @@
 <script>
 import {defineComponent} from 'vue'
 import router from "@/router";
+import {GOOGLE_AUTH_URL, KAKAO_AUTH_URL, NAVER_AUTH_URL} from "@/constant/ApiUrl/ApiUrl";
 
 export default defineComponent({
   name: "LoginPageView",
   data(){
     return {
       visible: false, // 비밀번호 확인
+      username: "",
+      password: ""
     }
   },
   methods: {
@@ -62,7 +68,23 @@ export default defineComponent({
     },
     moveFindUser(){
 
-    }
+    },
+    login(){
+      const {username, password} = this;
+      this.$emit("login", {username, password})
+    },
+    kakaoBtn(){
+      window.open(KAKAO_AUTH_URL,
+          "_blank", "width=480, height=720");
+    },
+    naverBtn(){
+      window.open(NAVER_AUTH_URL,
+          "_blank", "width=480, height=720");
+    },
+    googleBtn(){
+      window.open(GOOGLE_AUTH_URL,
+          "_blank", "width=480, height=720");
+    },
   }
 })
 </script>
@@ -115,11 +137,11 @@ export default defineComponent({
   background-repeat: no-repeat;
   margin-right: 60px;
 }
-#github-login-btn {
+#naver-login-btn {
   width: 70px;
   height: 70px;
   border-radius: 88px;
-  background-image: url('@/assets/snsLogin/github-logo.png');
+  background-image: url('@/assets/snsLogin/naver-logo.png');
   background-color: lightgray;
   background-position: 50%;
   background-size: cover;

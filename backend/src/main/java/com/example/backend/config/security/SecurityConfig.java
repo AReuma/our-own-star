@@ -1,12 +1,16 @@
 package com.example.backend.config.security;
 
-import jakarta.servlet.http.HttpServletRequest;
+import com.example.backend.common.exception.handler.OAuth2SuccessHandler;
+import com.example.backend.config.authentication.AuthenticationManagerConfig;
+import com.example.backend.member.service.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -14,12 +18,14 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
-import java.util.Arrays;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final AuthenticationManagerConfig authenticationManagerConfig;
+    private final OAuth2UserServiceImpl oAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception{
 
@@ -31,13 +37,28 @@ public class SecurityConfig {
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((authorizeRequests) ->
                 authorizeRequests
-                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/register")).permitAll()
+                        //.requestMatchers(new MvcRequestMatcher(introspector, "/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/login")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector,"/api/v1/auth/oauth2/naver")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/auth/oauth2/google")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/auth/oauth2/kakao")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/oauth2/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/register")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/checkUsername/**")).permitAll()
-                        .anyRequest().hasAuthority("USER")
-        )
+                        //.anyRequest().hasAuthority("USER")
+                        .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/api/v1/auth/oauth2"))
+                        .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/*"))
+                        .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
+                )
+                .apply(authenticationManagerConfig)
+                .and()
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // session 말고 jwt 사용
-                .formLogin((login) -> login.disable())
+                .formLogin(AbstractHttpConfigurer::disable)
                 ;
 
         return http.build();

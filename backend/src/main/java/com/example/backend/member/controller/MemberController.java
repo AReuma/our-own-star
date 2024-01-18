@@ -1,9 +1,7 @@
 package com.example.backend.member.controller;
 
 import com.example.backend.common.exception.dto.ErrorDTO;
-import com.example.backend.member.dto.LoginRequestDTO;
-import com.example.backend.member.dto.LoginResponseDTO;
-import com.example.backend.member.dto.RegisterRequestDTO;
+import com.example.backend.member.dto.*;
 import com.example.backend.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -51,5 +49,17 @@ public class MemberController {
     public ResponseEntity<Boolean> checkUsername(@PathVariable @NotBlank String username){
         log.info("checkUsername");
         return memberService.checkUsername(username);
+    }
+
+    @PostMapping("/email-certification")
+    public ResponseEntity<String> emailCertification(@RequestBody @Valid EmailCertificationRequestDTO emailCertificationRequestDTO){
+        log.info("emailCertification");
+        return memberService.emailCertification(emailCertificationRequestDTO);
+    }
+
+    @PostMapping("/email-certification/code")
+    public ResponseEntity<Boolean> emailCertificationCode(@RequestBody @Valid EmailCertificationCodeRequestDTO emailCertificationCodeRequestDTO){
+        log.info("emailCertificationCode");
+        return memberService.emailCertificationCode(emailCertificationCodeRequestDTO.getUsername(), emailCertificationCodeRequestDTO.getCode());
     }
 }

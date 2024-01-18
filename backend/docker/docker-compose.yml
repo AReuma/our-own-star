@@ -1,0 +1,7 @@
+version: '3'
+services:
+  our_own_star_redis:
+    image: redis:7.0.0
+    restart: always
+    ports:
+      - "6379:6379"

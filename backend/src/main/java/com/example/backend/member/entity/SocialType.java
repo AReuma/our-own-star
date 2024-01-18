@@ -1,5 +1,5 @@
 package com.example.backend.member.entity;
 
 public enum SocialType {
-    KAKAO, GITHUB, GOOGLE, DEFAULT
+    KAKAO, NAVER, GOOGLE, DEFAULT
 }
