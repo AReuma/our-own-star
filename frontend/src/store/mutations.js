@@ -1,4 +1,6 @@
 import {
+    FETCH_IDOL_CATEGORY,
+    FETCH_IDOL_CATEGORY_TOTAL_PAGE,
     FETCH_SEARCH_IDOL_INFO,
 } from "@/store/mutation-types";
 
@@ -11,5 +13,11 @@ export default {
     },
     setSearchIdolInfo(state, searchIdolInfo){
         state.searchIdolInfo = searchIdolInfo;
+    },
+    [FETCH_IDOL_CATEGORY](state, idolCategory){
+        state.idolCategory = idolCategory;
+    },
+    [FETCH_IDOL_CATEGORY_TOTAL_PAGE](state, idolCategoryTotalPage){
+        state.idolCategoryTotalPage = idolCategoryTotalPage;
     }
 }

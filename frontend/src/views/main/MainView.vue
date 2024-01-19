@@ -5,8 +5,12 @@
     <main-page-view
         @searchArtist="searchArtist"
         @addIdolCategory="addIdolCategory"
+        @movePage="movePage"
         :searchIdolInfo="searchIdolInfo"
         :searchIdolLoading="searchIdolLoading"
+        :idolCategory="idolCategory"
+        :idolCategoryTotalPage="idolCategoryTotalPage"
+        :pageNum="page"
     ></main-page-view>
   </div>
 </template>
@@ -17,11 +21,27 @@ import {VueCookieNext} from "vue-cookie-next";
 import MainPageHeaderView from "@/components/main/MainPageHeaderView.vue";
 import MainPageView from "@/components/main/MainPageView.vue";
 import MainPageSearchBarView from "@/components/main/MainPageSearchBarView.vue";
-import {mapState} from "vuex";
+import {mapActions, mapState} from "vuex";
 import axios from "axios";
 import {API_BASE_URL} from "@/constant/ApiUrl/ApiUrl";
+import router from "@/router";
+
+const config = {
+  headers: {
+    'Authorization': 'Bearer '+ VueCookieNext.getCookie('accessToken'),
+    'Accept' : 'application/json',
+    'Content-Type': 'application/json'
+  }
+};
+
 export default defineComponent({
   name: "MainView",
+  props: {
+    page: {
+      type: Number,
+      required: true,
+    },
+  },
   components: {MainPageSearchBarView, MainPageView, MainPageHeaderView},
   data(){
     return {
@@ -29,21 +49,13 @@ export default defineComponent({
     }
   },
   methods: {
+    ...mapActions(['fetchIdolCategory', 'fetchIdolCategoryTotalPage']),
     searchArtist(payload){
       const {artist} = payload
       console.log('artist: '+artist)
       this.$store.dispatch('fetchSearchIdolInfo', artist)
     },
     addIdolCategory(payload){
-
-      const config = {
-        headers: {
-          'Authorization': 'Bearer '+ VueCookieNext.getCookie('accessToken'),
-          'Accept' : 'application/json',
-          'Content-Type': 'application/json'
-        }
-      };
-
       const {artist, artistImg, artistGenre, artistType} = payload
       console.log({artist, artistImg, artistGenre, artistType})
       axios.post(API_BASE_URL+"/api/v1/idol/addCategory", {artist, artistImg, artistGenre, artistType}, config)
@@ -53,10 +65,20 @@ export default defineComponent({
           .catch((res) => {
             console.error(res)
           })
+    },
+    movePage(page){
+      console.log(page)
+      router.push({name: 'MainView',  query: { page: page }})
+      this.fetchIdolCategory(page)
     }
   },
+  mounted() {
+    console.log(this.page)
+    this.fetchIdolCategory(this.page)
+    this.fetchIdolCategoryTotalPage()
+  },
   computed:{
-    ...mapState(['searchIdolInfo', 'searchIdolLoading']),
+    ...mapState(['searchIdolInfo', 'searchIdolLoading', 'idolCategory', 'idolCategoryTotalPage']),
   }
 })
 </script>
