@@ -1,44 +1,167 @@
 <template>
-  <div id="main-layout">
-    <div id="main-title">
-      <div id="main-title-content">
-        <div id="top-title">
-          우리 모두가 사랑하는 <span class="text-pink">아이돌</span>과 함께하는
-        </div>
-        <div id="title">
-          'Our Own Star'!
-        </div>
-      </div>
-    </div>
+  <v-container id="main-layout" class="pa-9">
+    <v-row justify="center" style="width: 100%; height: 80%;">
+      <v-col v-for="v in idolCategory" :key="v" class="d-flex  align-center justify-center" cols="12" md="4">
+        <v-sheet class="sheet-style d-flex flex-column" color="skyblue" height="220" width="320">
+          <div class="category-profile-image">
+            <div style="filter: brightness(90%); width: 100%; height: 99%; background-size: cover; border-top-right-radius: 12px; border-top-left-radius: 12px;" :style="{ backgroundImage: `url(${v.artistImg})` }" >
+              <v-img :src="v.artistImg"></v-img>
+            </div>
+          </div>
+          <div class="category-name">
+            {{ v.artist }}
+          </div>
+        </v-sheet>
+      </v-col>
 
-    <div id="main-info">
-      <div id="main-content-1">
-        우리가 소중히 여기는 <span class="text-pink">&nbsp;아이돌</span>을 이야기하고, 공유하는 특별한 공간입니다.
-      </div>
-      <div id="main-content-2">
-        여기서는 아이돌의 음악, 모습, 활동 등에 대한 다양한 주제로 <span class="text-pink">&nbsp;소통</span>하며, 우리의 <span class="text-pink">&nbsp;팬심을 자유롭게 표현</span>할 수 있어요.<br>
-      </div>
-      <div id="main-content-3">
-        함께 아이돌의 매력을 발견하고, 팬들 간의 <span class="text-pink">&nbsp;소중한 추억</span>을 만들어보세요
-      </div>
-    </div>
+      <v-col class="d-flex  align-center justify-center" cols="12" md="4">
+        <v-sheet class="sheet-style d-flex flex-column" color="skyblue" height="220" width="320" @click="addArtist">
+          <div class="category-profile-image" style="background-color: #D9D9D9; font-size: 34px; font-family: EF_jejudoldam, sans-serif; text-align: center; color: #3498DB">
+            Our Own<br> Star
+          </div>
+          <div id="add-my-star" style="background-color: #FF1493">
+            add My Star
+          </div>
+        </v-sheet>
+      </v-col>
+    </v-row>
 
-    <div id="start-btn">
-      <v-btn id="my-btn" @click="moveMyIdol">내 아이돌 찾기</v-btn>
-    </div>
-  </div>
+    <v-row style="width: 100%; justify-content: center; align-items: center; height: 20%">
+      <v-pagination
+          color="blue"
+          :v-model="pageNum"
+          :length="idolCategoryTotalPage"
+          :total-visible="1"
+          prev-icon="mdi-chevron-left"
+          next-icon="mdi-chevron-right"
+          @update:model-value="movePage"
+      ></v-pagination>
+    </v-row>
+
+    <!--  Dialog  -->
+    <v-dialog v-model="addArtistDialog" persistent width="900" height="700" style="font-family: Dovemayo_wild, sans-serif ">
+      <v-card class="pa-3" style="height: 700px; width: 900px">
+
+        <v-card-title class="d-flex text-center justify-center" style="font-size: 32px;">
+          <v-row class="align-center text-center">
+            <v-col></v-col>
+            <v-col>내 아이돌 추가</v-col>
+            <v-col>
+              <v-card-actions class="justify-end">
+                <v-btn variant="plain" @click="closeArtistDialog">
+                  <v-icon size="30">mdi-close</v-icon>
+                </v-btn>
+              </v-card-actions>
+            </v-col>
+          </v-row>
+        </v-card-title>
+
+        <div style="width: 100%; display: flex; justify-content: center; margin-top: 20px">
+          <input v-model="searchArtist" id="search-box" type="text" @keydown.enter="searchIdol">
+          <v-btn id="search-btn" color="blue" :ripple="false" @click="searchIdol">검색</v-btn>
+        </div>
+
+        <div style="width: 100%; justify-content: end; margin-top: 20px; display: flex; height: 40px">
+          <v-btn variant="outlined" color="pink" :ripple="false" style="width: 100px" @click="addIdolCategory">만들기</v-btn>
+        </div>
+
+        <div style="width: 100%; height: 500px">
+          <div v-if="searchIdolLoading && searchArtist != null" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+            <v-progress-circular
+                indeterminate
+                color="pink"
+            ></v-progress-circular>
+          </div>
+
+          <div v-else class="pa-3" style="width: 100%; height: 100%;">
+            <div>
+            <v-radio-group v-model="selectedRadio">
+            <v-row justify="start">
+              <v-col v-for="(v, index) in searchIdolInfo" :key="v" class="align-center justify-center" cols="12" md="6">
+                <v-sheet class="sheet-style d-flex flex-column; align-center pl-2" color="backColor" height="130" width="100%">
+                  <div style="height: 100px; width: 15%; display: flex; justify-content: center">
+                    <v-radio color="pink" :value="index"></v-radio>
+                  </div>
+                  <v-avatar
+                      variant="flat"
+                      rounded="0"
+                      size="120"
+                  >
+                    <v-img
+                        style="border-radius: 12px"
+                        :src="v.artistImg"
+                        alt="John"
+                    ></v-img>
+                  </v-avatar>
+
+                  <div class="pa-5" style="width: 100%; height: 100%">
+                    <v-row style="font-size: 25px">
+                      <v-col>{{ v.artist }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col>
+                        {{ v.artistGenre }}
+                      </v-col>
+                    </v-row>
+
+                    <v-row no-gutters>
+                      <v-col>
+                        {{ v.artistType }}
+                      </v-col>
+                    </v-row>
+                  </div>
+                </v-sheet>
+              </v-col>
+            </v-row>
+            </v-radio-group>
+          </div>
+        </div>
+        </div>
+      </v-card>
+    </v-dialog>
+  </v-container>
 </template>
 
 <script>
 import {defineComponent} from 'vue'
-import router from "@/router";
 
 export default defineComponent({
   name: "MainPageView",
-  methods: {
-    moveMyIdol(){
-      router.push({name: "LoginView"})
+  props: ['searchIdolInfo', 'searchIdolLoading', 'idolCategory', 'idolCategoryTotalPage', 'pageNum'],
+  data(){
+    return{
+      searchArtist: '',
+      addArtistDialog: false,
+      data: [],
+      selectedRadio: null
     }
+  },
+  methods: {
+    searchIdol(){
+      let artist = this.searchArtist;
+      this.$emit('searchArtist', {artist})
+    },
+    addArtist(){
+      this.addArtistDialog = true;
+    },
+    closeArtistDialog(){
+      this.addArtistDialog = false;
+      let resetArr = [];
+      this.selectedRadio = null;
+      this.$store.dispatch('fetchArtistInfoReset', resetArr)
+    },
+    addIdolCategory(){
+      console.log(this.searchIdolInfo[this.selectedRadio])
+      let searchIdolInfoElement = this.searchIdolInfo[this.selectedRadio];
+      this.$emit("addIdolCategory", searchIdolInfoElement);
+    },
+    movePage(page){
+      console.log("test: ", page)
+      this.$emit('movePage', page)
+    },
+  },
+  created() {
+    this.page = this.pageNum;
   }
 })
 </script>
@@ -46,119 +169,64 @@ export default defineComponent({
 <style scoped>
 #main-layout {
   width: 100%;
-  height: 100vh;
-  background: #F0F0F0;
-  padding: 80px 100px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
-#main-title{
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  margin-bottom: 32px;
+.sheet-style {
+  border-radius: 12px;
 }
-#main-title-content{
+.category-profile-image{
   display: flex;
-  padding-top: 26px;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-}
-#top-title{
-  display: flex;
-  width: 643px;
-  height: 20px;
-  flex-direction: row;
-  justify-content: center;
-  flex-shrink: 0;
-  color: #000;
-  text-align: center;
-  font-family: EF_jejudoldam, sans-serif;
-  font-size: 32px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-  margin-bottom: 18px;
-}
-#title {
-  display: flex;
-  width: 906px;
-  height: 75px;
-  flex-direction: column;
-  justify-content: center;
-  flex-shrink: 0;
-  color: #3498DB;
-  text-align: center;
-  font-family: EF_jejudoldam, sans-serif;
-  font-size: 64px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-}
-#main-info {
-  display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-shrink: 0;
-  color: #000;
-  text-align: center;
-  font-size: 32px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-}
-#main-content-1{
-  display: inline-flex;
-  align-items: center;
-  color: #000;
-  text-align: center;
-  font-size: 30px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-}
-#main-content-2{
-  display: inline-flex;
-  padding: 30px 20px 0 20px;
-  flex-direction: row;
-  align-items: center;
-  color: #000;
-  text-align: center;
-  font-size: 30px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-  white-space: nowrap;
-}
-#main-content-3{
-  font-size: 30px;
-  font-style: normal;
-}
-#start-btn{
   width: 100%;
-  height: 140px;
+  border-top-right-radius: 12px;
+  border-top-left-radius: 12px;
+  height: 70%;
+  background-color: white;
+}
+.category-name {
+  max-width: fit-content;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: EF_jejudoldam, sans-serif;
+  border-bottom-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+  height: 30%;
   display: flex;
-  margin-top: 25px;
   justify-content: center;
   align-items: center;
+  font-size: 22px;
+  font-weight: bolder;
+  color: white;
+  margin: 0 auto;
 }
-#my-btn{
+#add-my-star{
+  font-family: EF_jejudoldam, sans-serif;
+  border-bottom-right-radius: 12px;
+  border-bottom-left-radius: 12px;
   display: flex;
-  width: 258px;
-  height: 48px;
-  flex-direction: column;
   justify-content: center;
-  flex-shrink: 0;
-  color: #FFF;
+  align-items: center;
+  font-size: 22px;
+  font-weight: bolder;
+  color: white;
+  height: 30%;
+}
+#search-box {
+  width: 50%;
+  height: 60px;
+  background-color: #D9D9D9;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
   text-align: center;
-  font-size: 28px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-  background-color: #3498DB;
+  font-size: 20px;
+  outline: none
+}
+#search-btn {
+  height: 60px;
+  width: 10%;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  font-size: 20px
 }
 </style>

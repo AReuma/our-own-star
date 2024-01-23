@@ -1,17 +1,17 @@
 <template>
   <div>
-    <main-page-view></main-page-view>
+    <main-logo-page-view></main-logo-page-view>
   </div>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
-import MainPageView from "@/components/main/MainPageView.vue";
+import MainLogoPageView from "@/components/main/MainLogoPageView.vue";
 
 export default defineComponent({
   name: 'HomeView',
   components: {
-    MainPageView
+    MainLogoPageView
   },
 });
 </script>
