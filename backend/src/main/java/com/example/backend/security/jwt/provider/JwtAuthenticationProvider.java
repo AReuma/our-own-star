@@ -40,18 +40,19 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(Claims claims){
-        Object rolesObject = claims.get("role");
+        String rolesObject = claims.get("role", String.class);
 
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        if (rolesObject instanceof String) {
+        authorities.add(() -> rolesObject);
+        /*if (rolesObject instanceof String) {
             // "role" 클레임이 단일 값인 경우
             authorities.add(() -> (String) rolesObject);
         } else if (rolesObject instanceof List) {
             // "role" 클레임이 리스트인 경우
             List<String> roles = (List<String>) rolesObject;
             authorities.add(() -> roles.get(0));
-        }
+        }*/
 
         return authorities;
     }
