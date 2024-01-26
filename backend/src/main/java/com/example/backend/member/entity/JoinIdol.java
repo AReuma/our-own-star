@@ -24,4 +24,11 @@ public class JoinIdol {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idol_category_id")
     private IdolCategory idolCategory;
+
+    public static JoinIdol createJoinIdol(Member member, IdolCategory idolCategory){
+        return JoinIdol.builder()
+                .member(member)
+                .idolCategory(idolCategory)
+                .build();
+    }
 }
