@@ -9,7 +9,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IdolCategoryInfoDTO {
+public class IdolCategoryResponseDTO {
+
+    @NotBlank(message = "artistId not blank")
+    @Schema(name = "아티스트 아이디", example = "1")
+    private Long id;
 
     @NotBlank(message = "artist not blank")
     @Schema(name = "아티스트 이름", example = "EXO")
@@ -26,4 +30,8 @@ public class IdolCategoryInfoDTO {
     @NotBlank(message = "artist not blank")
     @Schema(name = "아티스트 타입", example = "그룹 (남성)")
     private String artistType;
+
+    @NotBlank(message = "isJoin not blank")
+    @Schema(name = "가입여부", example = "TRUE")
+    private Boolean isJoin;
 }

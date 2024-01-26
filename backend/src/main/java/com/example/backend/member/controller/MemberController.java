@@ -1,6 +1,7 @@
 package com.example.backend.member.controller;
 
 import com.example.backend.common.exception.dto.ErrorDTO;
+import com.example.backend.config.swagger.DisableSwaggerSecurity;
 import com.example.backend.member.dto.*;
 import com.example.backend.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,7 @@ public class MemberController {
             @ApiResponse(responseCode = "401", description = "비밀번호 틀림", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
             @ApiResponse(responseCode = "404", description = "회원이 없음", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
+    @DisableSwaggerSecurity
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO){
         log.info("login");
@@ -38,6 +40,7 @@ public class MemberController {
         return memberService.login(loginRequestDTO.getUsername(), loginRequestDTO.getPassword());
     }
 
+    @DisableSwaggerSecurity
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequestDTO  registerRequestDTO){
         log.info("register");
@@ -45,18 +48,21 @@ public class MemberController {
                 registerRequestDTO.getNickname(), registerRequestDTO.getPhoneNum());
     }
 
+    @DisableSwaggerSecurity
     @GetMapping("/checkUsername/{username}")
     public ResponseEntity<Boolean> checkUsername(@PathVariable @NotBlank String username){
         log.info("checkUsername");
         return memberService.checkUsername(username);
     }
 
+    @DisableSwaggerSecurity
     @PostMapping("/email-certification")
     public ResponseEntity<String> emailCertification(@RequestBody @Valid EmailCertificationRequestDTO emailCertificationRequestDTO){
         log.info("emailCertification");
         return memberService.emailCertification(emailCertificationRequestDTO);
     }
 
+    @DisableSwaggerSecurity
     @PostMapping("/email-certification/code")
     public ResponseEntity<Boolean> emailCertificationCode(@RequestBody @Valid EmailCertificationCodeRequestDTO emailCertificationCodeRequestDTO){
         log.info("emailCertificationCode");

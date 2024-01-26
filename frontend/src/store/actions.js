@@ -50,11 +50,28 @@ export default {
                 console.error(res)
             })
     },
+    fetchUserIdolCategory({commit}, {page, username}) {
+        let cookie = VueCookieNext.getCookie('accessToken');
+        return axios.get(API_BASE_URL+"/api/v1/idol/page/"+page+"/username/"+username, {
+            headers: {
+                'Authorization': cookie ? 'Bearer ' + cookie : null,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((res) => {
+                commit(FETCH_IDOL_CATEGORY, res.data)
+            })
+            .catch((res) => {
+                console.error(res)
+            })
+    },
     fetchIdolCategoryTotalPage({commit}){
         return axios.get(API_BASE_URL+"/api/v1/idol/getTotalPage")
             .then((res) => {
                 console.log(res.data)
                 commit(FETCH_IDOL_CATEGORY_TOTAL_PAGE, res.data)
             })
-    }
+    },
+
 }

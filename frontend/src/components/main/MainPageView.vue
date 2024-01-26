@@ -1,15 +1,18 @@
 <template>
   <v-container id="main-layout" class="pa-9">
     <v-row justify="center" style="width: 100%; height: 80%;">
-      <v-col v-for="v in idolCategory" :key="v" class="d-flex  align-center justify-center" cols="12" md="4">
-        <v-sheet class="sheet-style d-flex flex-column" color="skyblue" height="220" width="320">
+      <v-col v-for="(artist, index) in idolCategory" :key="index" class="d-flex  align-center justify-center" cols="12" md="4" @click="artistCategoryClick(index)">
+        <v-sheet class="sheet-style d-flex flex-column" style="position:relative;" color="skyblue" height="220" width="320">
+          <div v-if="artist.isJoin" style="position: absolute; z-index: 6;">
+            <v-icon color="pink" icon="mdi-heart-circle-outline" size="40"></v-icon>
+          </div>
           <div class="category-profile-image">
-            <div style="filter: brightness(90%); width: 100%; height: 99%; background-size: cover; border-top-right-radius: 12px; border-top-left-radius: 12px;" :style="{ backgroundImage: `url(${v.artistImg})` }" >
-              <v-img :src="v.artistImg"></v-img>
+            <div style="filter: brightness(90%); width: 100%; height: 100%; background-size: cover; border-top-right-radius: 12px; border-top-left-radius: 12px;" :style="{ backgroundImage: `url(${artist.artistImg})` }" >
+              <v-img :src="artist.artistImg"></v-img>
             </div>
           </div>
           <div class="category-name">
-            {{ v.artist }}
+            {{ artist.artist }}
           </div>
         </v-sheet>
       </v-col>
@@ -119,11 +122,65 @@
         </div>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="joinArtistDialog" persistent width="500" height="600"  style="font-family: Dovemayo_wild, sans-serif ">
+      <v-card class="pa-3" style="height: 600px; width: 500px">
+        <v-card-title class="d-flex text-center justify-center" style="font-size: 32px;">
+          <v-row class="align-center text-center">
+            <v-col></v-col>
+            <v-col>{{ joinArtistInfo.artist }}</v-col>
+            <v-col>
+              <v-card-actions class="justify-end">
+                <v-btn variant="plain" @click="closeJoinArtistDialog">
+                  <v-icon size="30">mdi-close</v-icon>
+                </v-btn>
+              </v-card-actions>
+            </v-col>
+          </v-row>
+        </v-card-title>
+
+        <v-card-text>
+          <v-row justify="center">
+            <v-col cols="6">
+              <v-img :src="joinArtistInfo.artistImg"  max-width="100%" max-height="100%"></v-img>
+            </v-col>
+          </v-row>
+
+          <v-row justify="center" style="margin-top: 50px">
+            <v-col cols="4">
+              artist:
+            </v-col>
+            <v-col cols="4">
+              {{joinArtistInfo.artist}}
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="4">
+              artistGenre:
+            </v-col>
+            <v-col cols="4">
+              {{joinArtistInfo.artistGenre}}
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="4">
+              artistType:
+            </v-col>
+            <v-col cols="4">
+              {{joinArtistInfo.artistType}}
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-btn @click="joinArtist" style="height: 60px" variant="flat" color="blue">가입하기</v-btn>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script>
 import {defineComponent} from 'vue'
+import router from "@/router";
 
 export default defineComponent({
   name: "MainPageView",
@@ -133,7 +190,9 @@ export default defineComponent({
       searchArtist: '',
       addArtistDialog: false,
       data: [],
-      selectedRadio: null
+      selectedRadio: null,
+      joinArtistDialog: false,
+      joinArtistInfo: []
     }
   },
   methods: {
@@ -159,6 +218,24 @@ export default defineComponent({
       console.log("test: ", page)
       this.$emit('movePage', page)
     },
+    artistCategoryClick(index){
+      if(this.idolCategory[index].isJoin){
+        //alert("이미 가입되어있습니다")
+        let artist = this.idolCategory[index].artist;
+        router.push({name: 'ArtistView', params: {artist: artist}})
+      }else {
+        this.joinArtistInfo = this.idolCategory[index];
+        this.joinArtistDialog = true
+        console.log(this.joinArtistInfo)
+      }
+    },
+    closeJoinArtistDialog(){
+      this.joinArtistDialog = false
+    },
+    joinArtist(){
+      let id = this.joinArtistInfo.id;
+      this.$emit('joinArtist', {id})
+    }
   },
   created() {
     this.page = this.pageNum;

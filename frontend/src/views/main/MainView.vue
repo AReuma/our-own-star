@@ -6,11 +6,13 @@
         @searchArtist="searchArtist"
         @addIdolCategory="addIdolCategory"
         @movePage="movePage"
+        @joinArtist="joinArtist"
         :searchIdolInfo="searchIdolInfo"
         :searchIdolLoading="searchIdolLoading"
         :idolCategory="idolCategory"
         :idolCategoryTotalPage="idolCategoryTotalPage"
         :pageNum="page"
+        ref="mainPageView"
     ></main-page-view>
   </div>
 </template>
@@ -23,7 +25,7 @@ import MainPageView from "@/components/main/MainPageView.vue";
 import MainPageSearchBarView from "@/components/main/MainPageSearchBarView.vue";
 import {mapActions, mapState} from "vuex";
 import axios from "axios";
-import {API_BASE_URL} from "@/constant/ApiUrl/ApiUrl";
+import {API_BASE_URL, ARTIST_CATEGORY} from "@/constant/ApiUrl/ApiUrl";
 import router from "@/router";
 
 const config = {
@@ -45,11 +47,11 @@ export default defineComponent({
   components: {MainPageSearchBarView, MainPageView, MainPageHeaderView},
   data(){
     return {
-      username: VueCookieNext.getCookie('nickname')
+      username: VueCookieNext.getCookie('email')
     }
   },
   methods: {
-    ...mapActions(['fetchIdolCategory', 'fetchIdolCategoryTotalPage']),
+    ...mapActions(['fetchIdolCategory', 'fetchIdolCategoryTotalPage', 'fetchUserIdolCategory']),
     searchArtist(payload){
       const {artist} = payload
       console.log('artist: '+artist)
@@ -61,6 +63,7 @@ export default defineComponent({
       axios.post(API_BASE_URL+"/api/v1/idol/addCategory", {artist, artistImg, artistGenre, artistType}, config)
           .then((res) => {
             console.log(res)
+            location.reload();
           })
           .catch((res) => {
             console.error(res)
@@ -68,13 +71,37 @@ export default defineComponent({
     },
     movePage(page){
       console.log(page)
-      router.push({name: 'MainView',  query: { page: page }})
-      this.fetchIdolCategory(page)
+      if (VueCookieNext.isCookieAvailable('accessToken')){
+        const {username} = this;
+        this.fetchUserIdolCategory({page, username})
+      }else {
+        this.fetchIdolCategory(page)
+      }
+    },
+    joinArtist(payload){
+      const {id} = payload
+      axios.post(API_BASE_URL+ARTIST_CATEGORY+"/join", {id}, config)
+          .then((res) => {
+            console.log(res)
+            alert(res.data.artist+"님 페이지 가입완료")
+
+            router.push({name: 'ArtistView', params: {artist: res.data.artist}})
+          })
+          .catch((err) => {
+            console.error(err.response)
+            alert(err.response.data.errorMessage)
+            this.$refs.mainPageView.joinArtistDialog = false;
+          })
     }
   },
   mounted() {
     console.log(this.page)
-    this.fetchIdolCategory(this.page)
+    if (VueCookieNext.isCookieAvailable('accessToken')){
+      const {page, username} = this;
+      this.fetchUserIdolCategory({page, username})
+    }else {
+      this.fetchIdolCategory(this.page)
+    }
     this.fetchIdolCategoryTotalPage()
   },
   computed:{

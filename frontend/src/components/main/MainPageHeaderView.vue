@@ -28,7 +28,7 @@
                   <v-divider class="my-3"></v-divider>
                   <v-btn rounded variant="text"> 마이 페이지 </v-btn>
                   <v-divider class="my-3"></v-divider>
-                  <v-btn rounded variant="text"> 로그아웃 </v-btn>
+                  <v-btn @click="logout()" rounded variant="text"> 로그아웃 </v-btn>
                 </div>
               </v-card-text>
             </v-card>
@@ -58,6 +58,9 @@ export default defineComponent({
     },
     registerBtn(){
       router.push({name: 'RegisterView'})
+    },
+    logout(){
+
     }
   },
   mounted() {

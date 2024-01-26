@@ -39,7 +39,6 @@ public class GetIdolInfoCrawlingService {
 
             List<WebElement> searchResults = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("li.like_group")));
 
-
             for (WebElement result : searchResults) {
                 String listItemText = result.getText();
                 WebElement imgElement = result.findElement(By.tagName("img"));
@@ -59,10 +58,11 @@ public class GetIdolInfoCrawlingService {
                     String artistGenre = artistGenreElement.getText();
                     String artistType = artistTypeElement.getText();
                     idolCategoryInfoResponse.add(new IdolCategoryInfoDTO(artistName, artistImg, artistGenre, artistType));
-                } else {
+                }
+                /* else {
                     log.error(artistTypeElement+"!!!");
                     System.out.println("Artist Type not found for the current like_group element.");
-                }
+                }*/
             }
         }catch (Exception e){
             log.error("exception: {}", e.getMessage());

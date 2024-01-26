@@ -5,6 +5,7 @@ import com.example.backend.security.jwt.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,27 @@ public class OAuth2SuccessHandler extends SavedRequestAwareAuthenticationSuccess
         String accessToken = jwtUtil.createAccessToken(customOAuth2User.getUsername(), customOAuth2User.getName(), role);
         String refreshToken = jwtUtil.createRefreshToken(customOAuth2User.getUsername(), customOAuth2User.getName(), role);
 
-        response.sendRedirect("http://localhost:8080/auth/oauth-response?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
+                        .maxAge(1000 * 60L * 60 * 3)
+                                .path("/")
+                                        .secure(false)
+                                                .httpOnly(true)
+                                                        .build();
+
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .maxAge(1000 * 60L * 60 * 5)
+                .path("/")
+                .secure(false)
+                .httpOnly(true)
+                .build();
+
+
+
+        response.addHeader("Set-Cookie", accessCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+
+        response.sendRedirect("http://localhost:8080/auth/oauth-response");
         response.getWriter().flush();
     }
 

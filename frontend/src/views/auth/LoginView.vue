@@ -40,8 +40,7 @@ export default defineComponent({
             VueCookieNext.setCookie('refreshToken', this.refreshToken, ACCESS_TOKEN_EXPIRE);
 
             ParsingInfo(this.accessToken).then(() => {
-              console.log('test')
-              router.push({name: 'MainView'})
+              router.push({name: 'MainView',  params: { page: 1 }})
             })
 
           })

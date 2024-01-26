@@ -1,6 +1,7 @@
 package com.example.backend.config.security;
 
 import com.example.backend.common.exception.handler.OAuth2SuccessHandler;
+import com.example.backend.common.exception.jwt.CustomAuthenticationEntryPoint;
 import com.example.backend.config.authentication.AuthenticationManagerConfig;
 import com.example.backend.member.service.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,8 @@ public class SecurityConfig {
     private final AuthenticationManagerConfig authenticationManagerConfig;
     private final OAuth2UserServiceImpl oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception{
 
@@ -46,8 +49,14 @@ public class SecurityConfig {
                         .requestMatchers(new MvcRequestMatcher(introspector, "/oauth2/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/register")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/checkUsername/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/idol/page/*")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/idol/getTotalPage")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/v3/api-docs/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/v3/api-docs")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/swagger-ui/**")).permitAll()
                         //.anyRequest().hasAuthority("USER")
-                        .anyRequest().authenticated()
+                        //.anyRequest().authenticated()
+                        .anyRequest().hasRole("USER")
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(endpoint -> endpoint.baseUri("/api/v1/auth/oauth2"))
@@ -55,12 +64,10 @@ public class SecurityConfig {
                         .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
                 )
-                .apply(authenticationManagerConfig)
-                .and()
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // session 말고 jwt 사용
                 .formLogin(AbstractHttpConfigurer::disable)
-                ;
-
+                .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint))
+                .apply(authenticationManagerConfig);
         return http.build();
     }
 
