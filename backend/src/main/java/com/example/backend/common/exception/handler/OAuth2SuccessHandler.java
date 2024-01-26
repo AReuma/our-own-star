@@ -32,7 +32,6 @@ public class OAuth2SuccessHandler extends SavedRequestAwareAuthenticationSuccess
                         .maxAge(1000 * 60L * 60 * 3)
                                 .path("/")
                                         .secure(false)
-                                                .httpOnly(true)
                                                         .build();
 
 
