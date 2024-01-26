@@ -4,6 +4,10 @@ import LoginView from "@/views/auth/LoginView.vue";
 import RegisterView from "@/views/auth/RegisterView.vue";
 import OAuthView from "@/views/auth/OAuthView.vue";
 import MainView from "@/views/main/MainView.vue";
+import ArtistView from "@/views/artist/ArtistView.vue";
+import ArtistMarketPageView from "@/components/artist/ArtistMarketPageView.vue";
+import ArtistBookMarkPageView from "@/components/artist/ArtistBookMarkPageView.vue";
+import ArtistPopularPostPageView from "@/components/artist/ArtistPopularPostPageView.vue";
 
 const routes = [
   {
@@ -14,7 +18,8 @@ const routes = [
   {
     path: '/our-own-star',
     name: 'MainView',
-    component: MainView
+    component: MainView,
+    props: { page: 1 }
   },
   {
     path: '/our-own-star/login',
@@ -30,7 +35,27 @@ const routes = [
     path: '/auth/oauth-response',
     name: 'OAuthView',
     component: OAuthView
-  }
+  },
+  {
+    path: '/our-own-star/:artist',
+    name: 'ArtistView',
+    component: ArtistView,
+    props: true,
+    children: [
+      {
+        path: 'market',
+        component: ArtistMarketPageView
+      },
+      {
+        path: 'bookmark',
+        component: ArtistBookMarkPageView
+      },
+      {
+        path: 'popularPost',
+        component: ArtistPopularPostPageView
+      }
+    ]
+  },
 ]
 
 const router = createRouter({
