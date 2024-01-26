@@ -17,6 +17,9 @@ public enum ErrorCode {
     NOT_FOUND_BOARD(HttpStatus.NOT_FOUND, ""),
     EMAIL_SEND_FAIL(HttpStatus.CONFLICT, ""),
     CACHE_DATA_NOT_EXISTED(HttpStatus.NOT_FOUND, ""),
+    IDOL_CATEGORY_DUPLICATED(HttpStatus.CONFLICT, ""),
+    IDOL_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, ""),
+    ALREADY_JOIN_USER(HttpStatus.CONFLICT, ""),
     ;
 
     private final HttpStatus httpStatus;
