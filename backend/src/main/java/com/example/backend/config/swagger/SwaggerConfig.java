@@ -57,7 +57,6 @@ public class SwaggerConfig {
         return new Info()
                 .title("Our Own Star")
                 .version("1.0")
-                .description("우리가 사랑하는 아이돌을 이야기하고 공유하는 특별한 공간")
-                ;
+                .description("우리가 사랑하는 아이돌을 이야기하고 공유하는 특별한 공간");
     }
 }
