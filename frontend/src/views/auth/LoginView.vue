@@ -12,9 +12,9 @@ import LoginPageView from "@/components/auth/LoginPageView.vue";
 import axios from "axios";
 import {API_BASE_URL} from "@/constant/ApiUrl/ApiUrl";
 import {VueCookieNext} from 'vue-cookie-next';
-import {ACCESS_TOKEN_EXPIRE} from "@/constant/jwt/JwtUtil";
 import {ParsingInfo} from "@/constant/jwt/JwtParser";
 import router from "@/router";
+import {ACCESS_TOKEN_EXPIRE, REFRESH_TOKEN_EXPIRE} from "@/constant/jwt/JwtUtil";
 
 export default defineComponent({
   name: "LoginView",
@@ -36,8 +36,13 @@ export default defineComponent({
             console.log(this.accessToken)
             console.log(this.refreshToken)
 
-            VueCookieNext.setCookie('accessToken', this.accessToken, ACCESS_TOKEN_EXPIRE);
-            VueCookieNext.setCookie('refreshToken', this.refreshToken, ACCESS_TOKEN_EXPIRE);
+
+            VueCookieNext.setCookie('accessToken', this.accessToken,  {
+              expire: ACCESS_TOKEN_EXPIRE, // 1시간
+            });
+            VueCookieNext.setCookie('refreshToken', this.refreshToken, {
+              expire: REFRESH_TOKEN_EXPIRE,
+            });
 
             ParsingInfo(this.accessToken).then(() => {
               router.push({name: 'MainView',  params: { page: 1 }})
