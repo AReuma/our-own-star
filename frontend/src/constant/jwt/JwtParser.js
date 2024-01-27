@@ -20,9 +20,15 @@ async function ParsingInfo(token){
         console.log("nickName: " + nickName)
         console.log("role: " + role)
 
-        VueCookieNext.setCookie('email', username, ACCESS_TOKEN_EXPIRE);
-        VueCookieNext.setCookie('role', role, ACCESS_TOKEN_EXPIRE);
-        VueCookieNext.setCookie('nickname', nickName, ACCESS_TOKEN_EXPIRE);
+        VueCookieNext.setCookie('email', username, {
+            expire: ACCESS_TOKEN_EXPIRE,
+        });
+        VueCookieNext.setCookie('role', role, {
+            expire: ACCESS_TOKEN_EXPIRE,
+        });
+        VueCookieNext.setCookie('nickname', nickName, {
+            expire: ACCESS_TOKEN_EXPIRE,
+        });
 
         resolve();
     });

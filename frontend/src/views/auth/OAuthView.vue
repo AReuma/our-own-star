@@ -21,8 +21,12 @@ export default defineComponent({
     this.accessToken = token.accessToken;
     this.refreshToken = token.refreshToken;
 
-    useCookie().setCookie('accessToken', this.accessToken, ACCESS_TOKEN_EXPIRE);
-    useCookie().setCookie('refreshToken', this.refreshToken, REFRESH_TOKEN_EXPIRE);
+    useCookie().setCookie('accessToken', this.accessToken, {
+      expire: ACCESS_TOKEN_EXPIRE,
+    });
+    useCookie().setCookie('refreshToken', this.refreshToken, {
+      expire: REFRESH_TOKEN_EXPIRE,
+    });
 
     const openerWindow = window.opener;
     const routeHome = this.$router.resolve(
