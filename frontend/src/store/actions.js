@@ -1,9 +1,9 @@
 import {
-    FETCH_IDOL_CATEGORY, FETCH_IDOL_CATEGORY_TOTAL_PAGE,
+    FETCH_IDOL_CATEGORY, FETCH_IDOL_CATEGORY_JOIN_IS_FIRST, FETCH_IDOL_CATEGORY_TOTAL_PAGE,
     FETCH_SEARCH_IDOL_INFO,
 } from './mutation-types'
 import axios from "axios";
-import {API_BASE_URL} from "@/constant/ApiUrl/ApiUrl";
+import {API_BASE_URL, ARTIST_CATEGORY} from "@/constant/ApiUrl/ApiUrl";
 import {VueCookieNext} from "vue-cookie-next";
 
 /*const config = {
@@ -20,7 +20,7 @@ export default {
         console.log("cookie: {}", cookie)
         console.log("cookie: {}", cookie ? 'Bearer ' + cookie : null)
         commit('setLoading', true)
-        return axios.get(API_BASE_URL+"/api/v1/idol/search/"+artist, {
+        return axios.get(API_BASE_URL+ARTIST_CATEGORY+"/search/"+artist, {
             headers: {
                 'Authorization': cookie ? 'Bearer ' + cookie : null,
                 'Accept': 'application/json',
@@ -42,7 +42,7 @@ export default {
         commit('setSearchIdolInfo', artistInfoReset)
     },
     fetchIdolCategory({commit}, page) {
-        return axios.get(API_BASE_URL+"/api/v1/idol/page/"+page)
+        return axios.get(API_BASE_URL+ARTIST_CATEGORY+"/page/"+page)
             .then((res) => {
                 commit(FETCH_IDOL_CATEGORY, res.data)
             })
@@ -52,7 +52,7 @@ export default {
     },
     fetchUserIdolCategory({commit}, {page, username}) {
         let cookie = VueCookieNext.getCookie('accessToken');
-        return axios.get(API_BASE_URL+"/api/v1/idol/page/"+page+"/username/"+username, {
+        return axios.get(API_BASE_URL+ARTIST_CATEGORY+"/page/"+page+"/username/"+username, {
             headers: {
                 'Authorization': cookie ? 'Bearer ' + cookie : null,
                 'Accept': 'application/json',
@@ -67,11 +67,24 @@ export default {
             })
     },
     fetchIdolCategoryTotalPage({commit}){
-        return axios.get(API_BASE_URL+"/api/v1/idol/getTotalPage")
+        return axios.get(API_BASE_URL+ARTIST_CATEGORY+"/getTotalPage")
             .then((res) => {
                 console.log(res.data)
                 commit(FETCH_IDOL_CATEGORY_TOTAL_PAGE, res.data)
             })
     },
+    fetchIdolCategoryJoinIsFirst({commit}, id){
+        let cookie = VueCookieNext.getCookie('accessToken');
+        return axios.get(API_BASE_URL+ARTIST_CATEGORY+"/join/"+id+"/userInfo", {
+            headers: {
+                'Authorization': cookie ? 'Bearer ' + cookie : null,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((res) => {
+                commit(FETCH_IDOL_CATEGORY_JOIN_IS_FIRST, res.data)
+            })
+    }
 
 }
