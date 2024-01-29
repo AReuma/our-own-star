@@ -85,7 +85,7 @@ export default defineComponent({
             console.log(res)
             alert(res.data.artist+"님 페이지 가입완료")
 
-            router.push({name: 'ArtistView', params: {artist: res.data.artist}})
+            router.push({name: 'ArtistMyInfoView', params: {artist: res.data.artist}})
           })
           .catch((err) => {
             console.error(err.response)

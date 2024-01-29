@@ -1,5 +1,5 @@
 import {
-    FETCH_IDOL_CATEGORY,
+    FETCH_IDOL_CATEGORY, FETCH_IDOL_CATEGORY_JOIN_IS_FIRST,
     FETCH_IDOL_CATEGORY_TOTAL_PAGE,
     FETCH_SEARCH_IDOL_INFO,
 } from "@/store/mutation-types";
@@ -19,5 +19,8 @@ export default {
     },
     [FETCH_IDOL_CATEGORY_TOTAL_PAGE](state, idolCategoryTotalPage){
         state.idolCategoryTotalPage = idolCategoryTotalPage;
+    },
+    [FETCH_IDOL_CATEGORY_JOIN_IS_FIRST](state, joinCategoryUserInfo){
+        state.joinCategoryUserInfo = joinCategoryUserInfo;
     }
 }

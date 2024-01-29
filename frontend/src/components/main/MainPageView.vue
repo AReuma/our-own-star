@@ -181,6 +181,7 @@
 <script>
 import {defineComponent} from 'vue'
 import router from "@/router";
+import {VueCookieNext} from "vue-cookie-next";
 
 export default defineComponent({
   name: "MainPageView",
@@ -192,7 +193,8 @@ export default defineComponent({
       data: [],
       selectedRadio: null,
       joinArtistDialog: false,
-      joinArtistInfo: []
+      joinArtistInfo: [],
+      accessToken: VueCookieNext.isCookieAvailable('accessToken')
     }
   },
   methods: {
@@ -219,14 +221,19 @@ export default defineComponent({
       this.$emit('movePage', page)
     },
     artistCategoryClick(index){
-      if(this.idolCategory[index].isJoin){
-        //alert("이미 가입되어있습니다")
-        let artist = this.idolCategory[index].artist;
-        router.push({name: 'ArtistView', params: {artist: artist}})
+      if(this.accessToken) {
+        if (this.idolCategory[index].isJoin) {
+          //alert("이미 가입되어있습니다")
+          let artist = this.idolCategory[index].artist;
+          router.push({name: 'ArtistView', params: {artist: artist}})
+        } else {
+          this.joinArtistInfo = this.idolCategory[index];
+          this.joinArtistDialog = true
+          console.log(this.joinArtistInfo)
+        }
       }else {
-        this.joinArtistInfo = this.idolCategory[index];
-        this.joinArtistDialog = true
-        console.log(this.joinArtistInfo)
+        alert('로그인이 필요한 서비스 입니다')
+        router.push({name: 'LoginView'})
       }
     },
     closeJoinArtistDialog(){

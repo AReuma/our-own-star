@@ -37,7 +37,7 @@ export default defineComponent({
   name: "MainLogoPageView",
   methods: {
     moveMyIdol(){
-      router.push({name: "LoginView"})
+      router.push({name: "MainView"})
     }
   }
 })
