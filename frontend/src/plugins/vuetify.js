@@ -11,7 +11,8 @@ const OurOwnStar = {
         pink: '#FF1493',
         blue: '#3498DB',
         backColor: '#F0F0F0',
-        skyblue: '#92C4F4'
+        skyblue: '#92C4F4',
+        gray: '#D9D9D9'
     }
 }
 
