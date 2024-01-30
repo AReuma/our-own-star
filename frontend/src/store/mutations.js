@@ -22,5 +22,8 @@ export default {
     },
     [FETCH_IDOL_CATEGORY_JOIN_IS_FIRST](state, joinCategoryUserInfo){
         state.joinCategoryUserInfo = joinCategoryUserInfo;
+    },
+    setTest(){
+
     }
 }
