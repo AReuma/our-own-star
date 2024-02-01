@@ -1,5 +1,8 @@
 import {
-    FETCH_IDOL_CATEGORY, FETCH_IDOL_CATEGORY_JOIN_IS_FIRST,
+    FETCH_IDOL_CATEGORY,
+    FETCH_IDOL_CATEGORY_BOARD,
+    FETCH_IDOL_CATEGORY_BOARD_TOTAL_PAGE,
+    FETCH_IDOL_CATEGORY_JOIN_IS_FIRST,
     FETCH_IDOL_CATEGORY_TOTAL_PAGE,
     FETCH_SEARCH_IDOL_INFO,
 } from "@/store/mutation-types";
@@ -23,7 +26,13 @@ export default {
     [FETCH_IDOL_CATEGORY_JOIN_IS_FIRST](state, joinCategoryUserInfo){
         state.joinCategoryUserInfo = joinCategoryUserInfo;
     },
-    setTest(){
-
+    [FETCH_IDOL_CATEGORY_BOARD](state, artistBoard){
+        if (artistBoard.length !== 0){
+            state.artistBoard.push(...artistBoard);
+        }
+    },
+    [FETCH_IDOL_CATEGORY_BOARD_TOTAL_PAGE](state, artistBoardTotalPage){
+        console.log(artistBoardTotalPage)
+        state.artistBoardTotalPage = artistBoardTotalPage;
     }
 }

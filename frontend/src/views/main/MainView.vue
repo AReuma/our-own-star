@@ -115,7 +115,7 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   background: #F0F0F0;
-  padding: 10px 100px 0 100px;
+  padding: 10px 200px 0 200px;
   display: flex;
   flex-direction: column;
   align-items: center;

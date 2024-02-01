@@ -4,4 +4,6 @@ export default {
     idolCategory: [],
     idolCategoryTotalPage: 0,
     joinCategoryUserInfo: [],
+    artistBoard: [],
+    artistBoardTotalPage: 0,
 }

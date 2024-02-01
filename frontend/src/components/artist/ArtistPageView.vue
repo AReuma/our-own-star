@@ -1,62 +1,16 @@
 <template>
   <div id="artist-layout">
     <div id="idol-category">
-      <div id="idol-category-title">
-        <div style="flex: 1;">
-          <v-btn @click="backPage" size="70" variant="text">
-            <v-icon size="50" icon="mdi-chevron-left" color="blue"></v-icon>
-          </v-btn>
-        </div>
-
-        <div id="idol-category-artist-name">
-         {{artist}}
-        </div>
-      </div>
-
-      <div style="margin-top: 25px">
-        <v-list lines="two" style="background-color: #F0F0F0; text-align: center;">
-          <v-list-item
-              v-for="(item, i) in items"
-              :key="i"
-              :value="item"
-              color="primary"
-              variant="text"
-              @clickOnce="category(item.routerName)"
-          >
-            <v-list-item-title style=" font-size: 20px" v-text="item.name"></v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </div>
-
-      <div style="display: flex; justify-content: center; margin-top: 30px;">
-        <v-btn @click="writePost" color="blue" style="font-size: 18px" width="85%" height="60px">게시글 작성</v-btn>
-      </div>
-
-
-      <div class="pa-5" id="category-user-info">
-        <div style="flex: 1">
-          <v-avatar size="60">
-            <v-img src="@/assets/profile/profile-test.jpg"></v-img>
-          </v-avatar>
-        </div>
-
-        <div id="category-user-nickname">
-          {{ joinCategoryUserInfo.nickname }}
-        </div>
-
-        <div style="position: relative;  flex: 1">
-          <v-icon size="50" icon="mdi-chevron-right" color="blue"></v-icon>
-        </div>
-      </div>
+      <artist-board-category :joinCategoryUserInfo="joinCategoryUserInfo" :artist="artist"></artist-board-category>
     </div>
 
-    <div style="flex: 3; border: 3px solid cadetblue; width: 100%; display: flex; flex-direction: column">
-      <div style="height: 10%; border: 1px solid red; flex: 1;  display: flex; align-items: center; justify-content: center;">
+    <div style="flex: 3; width: 100%; display: flex; flex-direction: column">
+      <div style="height: 10%; border-bottom: 1px solid #BCBCBC; flex: 1;  display: flex; align-items: center; justify-content: center;">
         <input id="search-box" type="text">
         <v-btn id="search-btn" color="blue" :ripple="false">검색</v-btn>
       </div>
-      <router-view style="flex: 8; overflow-y: scroll;" v-slot="{ Component }">
-        <component style="border: 1px solid green" :is="Component" />
+      <router-view style="flex: 8; overflow-y: scroll" v-slot="{ Component }">
+        <component :is="Component" :joinCategoryUserInfo="joinCategoryUserInfo"/>
       </router-view>
     </div>
 
@@ -96,9 +50,9 @@
               <input multiple type="file" style="display: none" accept="image/gif" ref="uploadGIFItemFile" @change="previewPostGif" />
             </div>
 
-            <div v-if="isAddVote" class="container-vote">
+            <div v-if="isAddVote" class="container-vote" style=" border: 1px solid #BCBCBC; border-radius: 12px; padding: 10px">
                 <div style="display: flex; flex-direction: column;">
-                  <v-btn @click="addChoice" style="width: 100px; margin-left: auto; margin-bottom: 15px">선택지 추가</v-btn>
+                  <v-btn @click="addChoice" variant="outlined" color="blue" style="width: 100px; margin-left: auto; margin-bottom: 15px">선택지 추가</v-btn>
                   <div style="display: flex; flex-direction: column; align-items: center;">
                     <v-text-field v-for="(choice, index) in voteChoice" :key="index" v-model="choice.value" style="width: 100%;" density="compact" variant="outlined" label="" append-icon="mdi-close" @click:append="deleteVoteChoice(index)"></v-text-field>
                   </div>
@@ -106,17 +60,19 @@
 
                 <div style="display: flex">
                   <v-select
+                      v-model="voteDay"
                       class="ma-1"
                       label="Day"
                       variant="outlined"
-                      :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                      :items="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
                       density="compact"
                   ></v-select>
                   <v-select
+                      v-model="voteHour"
                       class="ma-1"
                       label="Hours"
                       variant="outlined"
-                      :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                      :items="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
                       density="compact"
                   ></v-select>
                 </div>
@@ -141,22 +97,15 @@
 
 <script>
 import {defineComponent} from 'vue'
-import router from "@/router";
+import ArtistBoardCategory from "@/components/artist/ArtistBoardCategory.vue";
 
 export default defineComponent({
   name: "ArtistPageView",
+  components: {ArtistBoardCategory},
   props: ['artist', 'joinCategoryUserInfo'],
   data(){
     return {
       content: '',
-      items: [
-        {name: '홈', routerName: 'home', },
-        {name: this.artist+' 마켓', routerName: 'ArtistMarketPageView',},
-        {name: '북마크', routerName: 'ArtistBookMarkPageView',},
-        {name: '인기글', routerName: 'ArtistPopularPostPageView',},
-        {name: '마이페이지', routerName: 'ArtistMyInfoView',},
-        {name: '내 챗팅', routerName: 5,},
-      ],
       postItems: [
         {icon: 'mdi-image-outline', isDisabled: false, api: 'image'},
         {icon: 'mdi-file-gif-box', isDisabled: false, api: 'gif'},
@@ -167,52 +116,65 @@ export default defineComponent({
       previewPostImageURL: [],
       selectPostImageFile: [],
       previewPostGifURL: '',
-      selectPostGifFIle: '',
+      selectPostGifFIle: [],
       isAddVote: false,
       voteChoice: [
         {value: ''},
         {value: ''},
       ],
+      voteDay: 1,
+      voteHour: 1,
     }
   },
   methods: {
     savePost(){
       const disabledItems = this.postItems.filter(item => !item.isDisabled);
       let apiName = disabledItems[0].api;
+      console.log("apiName: "+apiName)
 
-      const formData = new FormData();
-      formData.append('content', this.content);
-
-      // 이미지
-      if(apiName === 'image'){
-        if (this.selectPostImageFile.length > 0){
-          for(let i = 0; i < this.selectPostImageFile[0].length; i++){
-            let selectPostImageFileElementElement = this.selectPostImageFile[0][i];
-            formData.append('postImg', selectPostImageFileElementElement);
+      if(this.content !== '') {
+        const formData = new FormData();
+        formData.append('content', this.content);
+        if (disabledItems.length === 4) {
+          const {content} = this;
+          this.$emit('post', {content})
+        } else if (apiName === 'image') { // 이미지
+          if (this.selectPostImageFile.length > 0) {
+            for (let i = 0; i < this.selectPostImageFile[0].length; i++) {
+              let selectPostImageFileElementElement = this.selectPostImageFile[0][i];
+              formData.append('postImg', selectPostImageFileElementElement);
+            }
           }
-        }
 
-        this.$emit('postImg', formData)
-      }else if(apiName === 'gif'){
-        console.log('gif')
-      }else if(apiName === 'vote'){
-        console.log('vote')
-      }else if(apiName === 'map'){
-        console.log('map')
+          this.$emit('postImg', formData)
+        } else if (apiName === 'gif') {
+          console.log('gif')
+          let selectPostImageFileElementElement = this.selectPostGifFIle[0]
+          formData.append('postImg', selectPostImageFileElementElement)
+
+          this.$emit('postImg', formData)
+        } else if (apiName === 'vote') {
+          console.log('vote')
+          const {voteHour, voteDay, content, voteChoice} = this;
+
+          let isVote = this.voteChoice.some(choice => choice.value === '');
+
+          if (voteChoice.length >= 2 && !isVote && !(this.voteDay === 0 && this.voteHour === 0)){
+            this.$emit('postVote', {voteHour, voteDay, content, voteChoice});
+          } else {
+            alert('vote를 채워주세요')
+          }
+
+
+        } else if (apiName === 'map') {
+          console.log('map')
+        }
+      }else {
+        alert("내용 작성 후 게시글을 저장해주세요")
       }
       // gif
       // 투표
       // 주소
-    },
-    backPage(){
-      router.go(-1)
-    },
-    category(routerName){
-      console.log(routerName)
-      router.push({name: routerName, params: {artist: this.artist}})
-    },
-    writePost(){
-      this.postDialog = true
     },
     closePostiDialog(){
       this.postDialog = false
@@ -258,7 +220,7 @@ export default defineComponent({
 
         reader.readAsDataURL(files[0]);
 
-        this.selectPostGifFIle = files[0];
+        this.selectPostGifFIle.push(files[0]);
       }
     },
     previewPostImage(event){
@@ -299,7 +261,7 @@ export default defineComponent({
     },
     deletePostGif(){
       this.previewPostGifURL = '';
-      this.selectPostGifFIle = '';
+      this.selectPostGifFIle = [];
 
       if (this.previewPostImageURL.length === 0){
         this.postItems.map((itme) => {
@@ -336,8 +298,42 @@ export default defineComponent({
       })
 
       this.isAddVote = false;
+    },
+    resetPostDialog(){
+      this.content = '';
+      this.selectPostImageFile = [];
+      this.previewPostImageURL = [];
+      this.selectPostGifFIle = [];
+      this.previewPostGifURL = '';
+      this.voteChoice = [
+        {value: ''},
+        {value: ''},
+      ];
+
+      this.postItems.map((itme) => {
+        itme.isDisabled = false;
+      })
+
+      this.postDialog = false;
     }
+  },
+  beforeRouteUpdate(to, from, next) {
+    console.log("testtesttest");
+    // 현재 라우터와 이전 라우터가 다르다면 필요한 동작 수행
+    if (to.fullPath !== from.fullPath) {
+      // 여기에서 직접 필요한 로직을 작성
+      console.log("라우터가 변경되었습니다.");
+
+      // 예: 페이지 이동 시 초기화 또는 데이터 로딩 등
+      if (this.$route.name === to.name) {
+        // 현재 라우터와 이동하려는 라우터의 name이 같으면 처리
+        this.$router.push(to); // 라우터 이동
+      }
+    }
+
+    next(); // next() 호출 필수
   }
+
 })
 </script>
 
@@ -359,40 +355,6 @@ export default defineComponent({
   flex-direction: column;
   border-right: 1px solid #BCBCBC;
 }
-#idol-category-title {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
-}
-#idol-category-artist-name {
-  flex: 5;
-  text-align: center;
-  color: #3498DB;
-  font-family: EF_jejudoldam, sans-serif;
-  font-size: 25px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-}
-#category-user-nickname {
-  margin-left: 10px;
-  color: #000;
-  flex: 3;
-  text-align: center;
-  font-size: 22px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-}
-#category-user-info {
-  position:absolute;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  width: 25%;
-  margin-bottom: 10px;
-}
 #search-box {
   width: 50%;
   height: 55px;
@@ -410,7 +372,6 @@ export default defineComponent({
   border-bottom-right-radius: 12px;
   font-size: 20px
 }
-
 .container-image {
   height: auto;
   width: 100%;

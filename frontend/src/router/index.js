@@ -13,6 +13,8 @@ import ArtistMyInfoView from "@/views/artist/myPage/ArtistMyInfoView.vue";
 import ArtistMyInfoCommentView from "@/components/artist/myPage/ArtistMyInfoCommentView.vue";
 import ArtistMyInfoMediaView from "@/components/artist/myPage/ArtistMyInfoMediaView.vue";
 import ArtistMyInfoLikeView from "@/components/artist/myPage/ArtistMyInfoLikeView.vue";
+import ArtistHomePageView from "@/components/artist/ArtistHomePageView.vue";
+import ArtistBoardReadView from "@/views/artist/ArtistBoardReadView.vue";
 
 const routes = [
   {
@@ -46,8 +48,13 @@ const routes = [
     name: 'ArtistView',
     component: ArtistView,
     props: true,
-    redirect: { name: 'ArtistMarketPageView' },
+    redirect: { name: 'ArtistHomePageView' },
     children: [
+      {
+        path: 'home',
+        name: 'ArtistHomePageView',
+        component: ArtistHomePageView
+      },
       {
         path: 'market',
         name: 'ArtistMarketPageView',
@@ -94,6 +101,12 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/our-own-star/:artist/board/:boardNum',
+    name: 'ArtistBoardReadView',
+    component: ArtistBoardReadView,
+    props: true
+  }
 ]
 
 const router = createRouter({

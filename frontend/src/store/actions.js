@@ -1,9 +1,13 @@
 import {
-    FETCH_IDOL_CATEGORY, FETCH_IDOL_CATEGORY_JOIN_IS_FIRST, FETCH_IDOL_CATEGORY_TOTAL_PAGE,
+    FETCH_IDOL_CATEGORY,
+    FETCH_IDOL_CATEGORY_BOARD,
+    FETCH_IDOL_CATEGORY_BOARD_TOTAL_PAGE,
+    FETCH_IDOL_CATEGORY_JOIN_IS_FIRST,
+    FETCH_IDOL_CATEGORY_TOTAL_PAGE,
     FETCH_SEARCH_IDOL_INFO,
 } from './mutation-types'
 import axios from "axios";
-import {API_BASE_URL, ARTIST_CATEGORY} from "@/constant/ApiUrl/ApiUrl";
+import {API_BASE_URL, ARTIST_CATEGORY, ARTIST_CATEGORY_BOARD} from "@/constant/ApiUrl/ApiUrl";
 import {VueCookieNext} from "vue-cookie-next";
 
 /*const config = {
@@ -85,6 +89,31 @@ export default {
             .then((res) => {
                 commit(FETCH_IDOL_CATEGORY_JOIN_IS_FIRST, res.data)
             })
+    },
+    fetchIdolCategoryBoard({commit}, {artist, page, nickname}){
+        let cookie = VueCookieNext.getCookie('accessToken');
+        return axios.get(API_BASE_URL+ARTIST_CATEGORY_BOARD+"/"+artist+"/"+nickname+"/"+page, {
+            headers: {
+                'Authorization': cookie ? 'Bearer ' + cookie : null,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((res) => {
+                commit(FETCH_IDOL_CATEGORY_BOARD, res.data)
+            })
+    },
+    fetchIdolCategoryBoardTotalPage({commit}, {artist, nickname}){
+        let cookie = VueCookieNext.getCookie('accessToken');
+        return axios.get(API_BASE_URL+ARTIST_CATEGORY_BOARD+"/"+artist+"/"+nickname+"/getTotalPage", {
+            headers: {
+                'Authorization': cookie ? 'Bearer ' + cookie : null,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((res) => {
+                commit(FETCH_IDOL_CATEGORY_BOARD_TOTAL_PAGE, res.data)
+            })
     }
-
 }
