@@ -20,6 +20,7 @@ public class IdolCategory extends TimeStamped {
     @Column(name = "idol_category_id")
     private Long id;
 
+    @Column(unique = true)
     private String artist;
 
     private String artistImg;
