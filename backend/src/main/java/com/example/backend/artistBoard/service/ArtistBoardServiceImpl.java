@@ -1,5 +1,7 @@
 package com.example.backend.artistBoard.service;
 
+import com.example.backend.artistBoard.dto.PostListResponseDTO;
+import com.example.backend.artistBoard.dto.PostListVoteResponseDTO;
 import com.example.backend.artistBoard.dto.PostResponseDTO;
 import com.example.backend.artistBoard.dto.PostVoteResponseDTO;
 import com.example.backend.artistBoard.entity.*;
@@ -13,7 +15,6 @@ import com.example.backend.common.s3.S3FileUploadService;
 import com.example.backend.idolCategory.repository.IdolCategoryRepository;
 import com.example.backend.member.entity.JoinIdol;
 import com.example.backend.member.repository.JoinIdolRepository;
-import com.example.backend.member.repository.MemberRepository;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -25,10 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.example.backend.artistBoard.entity.QArtistBoard.artistBoard;
 import static com.example.backend.artistBoard.entity.QArtistFollow.artistFollow;
@@ -45,6 +43,7 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
     private final ArtistBoardImageRepository artistBoardImageRepository;
     private final ArtistBoardVoteRepository artistBoardVoteRepository;
     private final S3FileUploadService s3FileUploadService;
+    private final RedisVoteService redisVoteService;
     private final EntityManager em;
 
     private void getIdolCategoryByArtist(String artist){
@@ -153,7 +152,7 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
     }
 
     @Override
-    public ResponseEntity<List<PostResponseDTO>> getUserFollowPost(String nickname, String artist, Integer page) {
+    public ResponseEntity<List<PostListResponseDTO>> getUserFollowPost(String nickname, String artist, Integer page) {
 
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
@@ -170,29 +169,29 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
                 .limit(4)
                 .fetch();
 
-        List<PostResponseDTO> responseDTOs = new ArrayList<>();
+        List<PostListResponseDTO> responseDTOs = new ArrayList<>();
 
         for (Tuple tuple : fetch) {
             BoardType boardType = tuple.get(artistBoard.boardType);
             ArtistBoard findArtistBoard = tuple.get(artistBoard);
 
-            Optional<PostVoteResponseDTO> postVoteResponseDTO = Optional.empty();
+            Optional<PostListVoteResponseDTO> postListVoteResponseDTO = Optional.empty();
             Optional<List<String>> image = Optional.empty();
 
             switch (boardType){
-                case VOTE -> postVoteResponseDTO = createPostVoteResponseDTO(findArtistBoard);
+                case VOTE -> postListVoteResponseDTO = createPostListVoteResponseDTO(findArtistBoard);
                 case IMAGE -> image = createImageList(findArtistBoard);
             }
 
             assert findArtistBoard != null;
-            responseDTOs.add(new PostResponseDTO(
+            responseDTOs.add(new PostListResponseDTO(
                     findArtistBoard.getId(),
                     findArtistBoard.getContent(),
                     findArtistBoard.getWriter().getNickname(),
                     findArtistBoard.getCreatedDate(),
                     boardType,
                     findArtistBoard.getWriter().getJoinIdolMemberProfile().getImgUrl(),
-                    postVoteResponseDTO,
+                    postListVoteResponseDTO,
                     image));
             //responseDTOs.add(new PostResponseDTO(findArtistBoard.getContent(), findArtistBoard.getWriter().getNickname(), findArtistBoard.getCreatedDate(), boardType, postVoteResponseDTO, image));
         }
@@ -220,7 +219,7 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
         Optional<List<String>> image = Optional.empty();
 
         switch (findArtistBoard.getBoardType()){
-            case VOTE -> postVoteResponseDTO = createPostVoteResponseDTO(findArtistBoard);
+            case VOTE -> postVoteResponseDTO = createPostVoteResponseDTO(findArtistBoard, username);
             case IMAGE -> image = createImageList(findArtistBoard);
 
         }
@@ -236,7 +235,7 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
                 image));
     }
 
-    private Optional<PostVoteResponseDTO> createPostVoteResponseDTO(ArtistBoard findArtistBoard) {
+    private Optional<PostListVoteResponseDTO> createPostListVoteResponseDTO(ArtistBoard findArtistBoard) {
         ArtistBoardVote artistBoardVote = findArtistBoard.getArtistBoardVote();
 
         List<String> choice = new ArrayList<>();
@@ -245,9 +244,50 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
         choice.add(artistBoardVote.getChoice3());
         choice.add(artistBoardVote.getChoice4());
 
+
+        return Optional.of(new PostListVoteResponseDTO(
+                choice,
+                artistBoardVote.getChoiceTotalCount(),
+                artistBoardVote.getVoteExpireTime()));
+    }
+
+    private Optional<PostVoteResponseDTO> createPostVoteResponseDTO(ArtistBoard findArtistBoard, String username) {
+        Boolean hasVoted = false;
+        String userVoteChoice = null;
+        Map<String, String> voteResults = new HashMap<>();
+
+        ArtistBoardVote artistBoardVote = findArtistBoard.getArtistBoardVote();
+
+        List<String> choice = new ArrayList<>();
+        choice.add(artistBoardVote.getChoice1());
+        choice.add(artistBoardVote.getChoice2());
+        choice.add(artistBoardVote.getChoice3());
+        choice.add(artistBoardVote.getChoice4());
+
+        boolean expireVote = false;
+        LocalDateTime currentTime = LocalDateTime.now();
+        if(currentTime.isAfter(artistBoardVote.getVoteExpireTime())){
+            expireVote = true;
+        }
+
+        // 이미 투표한 회원인지 확인
+        if(redisVoteService.hasVoted(username, String.valueOf(findArtistBoard.getId()))){ // 투표한적이 있음
+            System.out.println("이미 투표한적이 있습니다.");
+            voteResults = redisVoteService.getVoteResults(findArtistBoard.getId());
+            userVoteChoice = redisVoteService.getUserVoteChoice(username, String.valueOf(findArtistBoard.getId()));
+            hasVoted = true;
+        }else { // 투표한적이 없음.
+            System.out.println("이미 투표한 회원이 아닙니다.");
+        }
+
+
         return Optional.of(new PostVoteResponseDTO(
                 choice,
-                artistBoardVote.getChoiceCount(),
+                artistBoardVote.getChoiceTotalCount(),
+                hasVoted,
+                expireVote,
+                userVoteChoice,
+                voteResults,
                 artistBoardVote.getVoteExpireTime()));
     }
 

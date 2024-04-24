@@ -1,5 +1,6 @@
 package com.example.backend.artistBoard.service;
 
+import com.example.backend.artistBoard.dto.PostListResponseDTO;
 import com.example.backend.artistBoard.dto.PostResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,7 +16,7 @@ public interface ArtistBoardService {
 
     ResponseEntity<String> saveVotePost(String artist, String content, List<Map<String, String>> voteChoice, int voteDay, int voteHour, String username);
 
-    ResponseEntity<List<PostResponseDTO>> getUserFollowPost(String username, String artist, Integer page);
+    ResponseEntity<List<PostListResponseDTO>> getUserFollowPost(String username, String artist, Integer page);
 
     ResponseEntity<Integer> getUserFollowPostTotalPage(String username, String artist);
 

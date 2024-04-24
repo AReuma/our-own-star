@@ -6,6 +6,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * 선택지는 최대 4개 가능
+ * **/
 @Entity
 @Getter
 @Builder(toBuilder = true)
@@ -22,7 +25,11 @@ public class ArtistBoardVote extends TimeStamped {
     private String choice3;
     private String choice4;
 
-    private int choiceCount;
+    private int choiceTotalCount;
+    private int choiceCount1;
+    private int choiceCount2;
+    private int choiceCount3;
+    private int choiceCount4;
 
     /*@JoinColumn(name = "member_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,13 +40,17 @@ public class ArtistBoardVote extends TimeStamped {
 
     private LocalDateTime voteExpireTime;
 
-    public static ArtistBoardVote createVote(String choice1, String choice2, String choice3, String choice4, int choiceCount, ArtistBoard artistBoard, LocalDateTime voteExpireTime ){
+    public static ArtistBoardVote createVote(String choice1, String choice2, String choice3, String choice4, int choiceTotalCount, ArtistBoard artistBoard, LocalDateTime voteExpireTime ){
         return ArtistBoardVote.builder()
                 .choice1(choice1)
                 .choice2(choice2)
                 .choice3(choice3)
                 .choice4(choice4)
-                .choiceCount(choiceCount)
+                .choiceTotalCount(choiceTotalCount)
+                .choiceCount1(0)
+                .choiceCount2(0)
+                .choiceCount3(0)
+                .choiceCount4(0)
                 .artistBoard(artistBoard)
                 .voteExpireTime(voteExpireTime)
                 .build();
