@@ -1,7 +1,6 @@
 <template>
-  <div style="height: 300px; width: 100%; border: 23px solid blue">
-    ArtistMyInfoMediaView
-    <div></div>
+  <div>
+    에러 페이지
   </div>
 </template>
 
@@ -9,7 +8,7 @@
 import {defineComponent} from 'vue'
 
 export default defineComponent({
-  name: "ArtistMyInfoMediaView"
+  name: "ErrorView"
 })
 </script>
 

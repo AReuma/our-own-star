@@ -1,15 +1,41 @@
 <template>
   <div id="search-bar-layout">
-   <input id="search-box" type="text">
-    <v-btn id="search-btn" color="blue" :ripple="false">검색</v-btn>
+   <input v-model="searchArtistName" @keydown.enter="searchArtist" id="search-box" type="text">
+    <v-btn id="search-btn" color="blue" :ripple="false" @click="searchArtist">검색</v-btn>
   </div>
 </template>
 
 <script>
 import {defineComponent} from 'vue'
+import router from "@/router";
 
 export default defineComponent({
-  name: "MainPageSearchBarView"
+  name: "MainPageSearchBarView",
+  props: {
+    search: {
+      type: String,
+      default: ''
+    }
+  },
+  data(){
+    return {
+      searchArtistName: this.search,
+    }
+  },
+  methods: {
+    searchArtist(){
+      let search = this.searchArtistName
+      //alert(search)
+      router.push({name: 'MainSearchView', query: {search: search}});
+    }
+  },
+  watch: {
+    search(newQuery) {
+      if(newQuery){
+        this.searchArtistName = newQuery;
+      }
+    }
+  }
 })
 </script>
 

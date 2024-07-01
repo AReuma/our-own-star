@@ -19,6 +19,7 @@ export default {
     if(token.accessToken === null && token.refreshToken !== null){
       //this.$store.dispatch("refreshToken");
       // accessToken 요청
+      alert(token)
     }
   }
 }
