@@ -35,4 +35,8 @@ public class JoinIdolMemberProfile {
     public static JoinIdolMemberProfile createJoinIdolMemberProfile(){
         return JoinIdolMemberProfile.builder().imgUrl(generateRandomProfileImage()).build();
     }
+
+    public void updateUserProfileImg(String imgUrl){
+        this.imgUrl = imgUrl;
+    }
 }

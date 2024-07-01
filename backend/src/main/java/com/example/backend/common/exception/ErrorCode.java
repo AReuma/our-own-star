@@ -20,6 +20,9 @@ public enum ErrorCode {
     IDOL_CATEGORY_DUPLICATED(HttpStatus.CONFLICT, ""),
     IDOL_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, ""),
     ALREADY_JOIN_USER(HttpStatus.CONFLICT, ""),
+    USER_NOT_JOIN_IDOL_CATEGORY(HttpStatus.FORBIDDEN, ""),
+    NOT_FOUND_COMMENT_ID(HttpStatus.NOT_FOUND, ""),
+    NOT_FOUND_CHAT_ROOM(HttpStatus.NOT_FOUND, ""),
     ;
 
     private final HttpStatus httpStatus;

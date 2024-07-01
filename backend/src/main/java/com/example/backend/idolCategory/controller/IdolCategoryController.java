@@ -5,8 +5,6 @@ import com.example.backend.idolCategory.dto.*;
 import com.example.backend.idolCategory.service.GetIdolInfoCrawlingService;
 import com.example.backend.idolCategory.service.IdolCategoryService;
 import com.example.backend.member.dto.LoginInfoDto;
-import com.example.backend.member.dto.LoginResponseDTO;
-import com.querydsl.core.Tuple;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,7 +37,7 @@ public class IdolCategoryController {
     })
     @GetMapping("/search/{artist}")
     public ResponseEntity<List<IdolCategoryInfoDTO>> getIdolInfo(Authentication authentication, @PathVariable String artist){
-        log.info("artist: {}", authentication.getPrincipal());
+        log.info("artist: {}", artist);
 
         return getIdolInfoCrawlingService.getIdolInfo(artist);
     }
@@ -111,5 +109,32 @@ public class IdolCategoryController {
         log.info("join: {}", idolCategoryJoinRequestDTO.getId());
         LoginInfoDto loginInfo = (LoginInfoDto) authentication.getPrincipal();
         return idolCategoryService.joinIdolCategory(idolCategoryJoinRequestDTO.getId(), loginInfo.getUsername());
+    }
+
+    @GetMapping("/join/{artist}/userInfo")
+    public ResponseEntity<JoinIdolCategoryUserInfoDTO> joinIdolUserInfo(@PathVariable String artist, Authentication authentication){
+        log.info("id: {}", artist);
+        LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
+        return idolCategoryService.joinIdolUserInfo(artist, loginInfoDto.getUsername());
+    }
+
+    @GetMapping("/find/{artist}")
+    public ResponseEntity<List<IdolCategoryResponseDTO>> searchArtistName(@PathVariable String artist, Authentication authentication){
+        log.info("searchArtistName");
+        LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
+        return idolCategoryService.searchArtistName(artist, loginInfoDto.getUsername());
+    }
+
+    @GetMapping("/find/beforeLogin/{artist}")
+    public ResponseEntity<List<IdolCategoryResponseDTO>> searchBeforeLoginArtistName(@PathVariable String artist){
+        log.info("searchBeforeLoginArtistName");
+        return idolCategoryService.searchBeforeLoginArtistName(artist);
+    }
+
+    @PostMapping("/follow/user")
+    public ResponseEntity<String> followUser(@RequestBody FollowUser followUser, Authentication authentication){
+        log.info("followUser");
+        LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
+        return idolCategoryService.followUser(followUser.getArtist(), followUser.getFollowUser(), loginInfoDto.getUsername());
     }
 }

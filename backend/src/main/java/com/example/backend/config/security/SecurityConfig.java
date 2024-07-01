@@ -7,6 +7,7 @@ import com.example.backend.member.service.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -41,7 +42,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorizeRequests) ->
                 authorizeRequests
                         //.requestMatchers(new MvcRequestMatcher(introspector, "/**")).permitAll()
-                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/email-certification")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/email-certification/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/chat-websocket/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/login")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector,"/api/v1/auth/oauth2/naver")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/auth/oauth2/google")).permitAll()
@@ -51,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/checkUsername/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/idol/page/*")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/idol/getTotalPage")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/idol/find/beforeLogin/*")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/v3/api-docs/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/v3/api-docs")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/swagger-ui/**")).permitAll()
@@ -78,6 +82,7 @@ public class SecurityConfig {
 
         configuration.addAllowedOriginPattern("*");
         configuration.addAllowedHeader("*");
+        configuration.addAllowedHeader(HttpHeaders.AUTHORIZATION); // 클라이언트에게 Authorization 헤더 허용
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
 

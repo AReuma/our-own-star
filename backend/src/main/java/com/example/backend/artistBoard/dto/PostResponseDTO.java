@@ -21,6 +21,11 @@ public class PostResponseDTO {
     private LocalDateTime createDate;
     private BoardType boardType;
     private String writerProfile;
+    private boolean isLike;
+    private Integer likeCount;
+    private boolean isBookmark;
+    private Integer bookmarkCount;
+    private Integer commentCount;
 
     //vote
     private Optional<PostVoteResponseDTO> postVoteResponseDTO = Optional.empty();

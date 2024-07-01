@@ -23,7 +23,7 @@ public class ArtistFollow {
     @JoinColumn(name = "following_id")
     private JoinIdol following; // 팔로우 받은 사람
 
-    public static ArtistFollow createArtistBoard(JoinIdol follower, JoinIdol following){
+    public static ArtistFollow createFollowMember(JoinIdol follower, JoinIdol following){
         return ArtistFollow.builder()
                 .follower(follower)
                 .following(following)

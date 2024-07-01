@@ -34,6 +34,9 @@ public class JoinIdol {
     @JoinColumn(name = "join_idol_member_profile_id")
     private JoinIdolMemberProfile joinIdolMemberProfile;
 
+    @Lob
+    private String userInfo;
+
     @Transient
     private final Set<String> usedNicknames = Collections.synchronizedSet(new HashSet<>());
 
@@ -66,6 +69,11 @@ public class JoinIdol {
         joinIdol.addNickname(joinIdol.generateRandomNickname());
 
         return joinIdol;
+    }
+
+    public void updateUserInfo(String nickname, String userInfo){
+        this.nickname = nickname;
+        this.userInfo = userInfo;
     }
 
     public void changeIsFirst() {

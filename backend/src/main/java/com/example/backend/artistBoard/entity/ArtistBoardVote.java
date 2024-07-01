@@ -41,7 +41,7 @@ public class ArtistBoardVote extends TimeStamped {
     private LocalDateTime voteExpireTime;
 
     public static ArtistBoardVote createVote(String choice1, String choice2, String choice3, String choice4, int choiceTotalCount, ArtistBoard artistBoard, LocalDateTime voteExpireTime ){
-        return ArtistBoardVote.builder()
+        ArtistBoardVote vote = ArtistBoardVote.builder()
                 .choice1(choice1)
                 .choice2(choice2)
                 .choice3(choice3)
@@ -54,5 +54,9 @@ public class ArtistBoardVote extends TimeStamped {
                 .artistBoard(artistBoard)
                 .voteExpireTime(voteExpireTime)
                 .build();
+
+        artistBoard.addVote(vote);
+
+        return vote;
     }
 }

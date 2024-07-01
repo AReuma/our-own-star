@@ -1,17 +1,23 @@
 package com.example.backend.idolCategory.service;
 
+import com.example.backend.artistBoard.entity.ArtistFollow;
+import com.example.backend.artistBoard.repository.ArtistFollowRepository;
 import com.example.backend.common.exception.AppException;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.idolCategory.dto.IdolCategoryJoinResponseDTO;
 import com.example.backend.idolCategory.dto.IdolCategoryResponseDTO;
+import com.example.backend.idolCategory.dto.JoinIdolCategoryUserInfoDTO;
 import com.example.backend.idolCategory.entity.IdolCategory;
 import com.example.backend.idolCategory.repository.IdolCategoryRepository;
 import com.example.backend.member.entity.JoinIdol;
+import com.example.backend.member.entity.JoinIdolMemberProfile;
 import com.example.backend.member.entity.Member;
+import com.example.backend.member.repository.JoinIdolMemberProfileRepository;
 import com.example.backend.member.repository.JoinIdolRepository;
 import com.example.backend.member.repository.MemberRepository;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -23,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.backend.idolCategory.entity.QIdolCategory.idolCategory;
 import static com.example.backend.member.entity.QJoinIdol.joinIdol;
@@ -37,6 +44,8 @@ public class IdolCategoryServiceImpl implements IdolCategoryService{
     private final IdolCategoryRepository idolCategoryRepository;
     private final JoinIdolRepository joinIdolRepository;
     private final MemberRepository memberRepository;
+    private final JoinIdolMemberProfileRepository joinIdolMemberProfileRepository;
+    private final ArtistFollowRepository artistFollowRepository;
     private final EntityManager em;
 
     @Override
@@ -166,10 +175,149 @@ public class IdolCategoryServiceImpl implements IdolCategoryService{
                     throw new AppException(ErrorCode.ALREADY_JOIN_USER, "이미 가입한 회원입니다.");
                 }));
 
+        // 회원 프로필 이미지 저장
+        JoinIdolMemberProfile joinIdolMemberProfile = JoinIdolMemberProfile.createJoinIdolMemberProfile();
+        joinIdolMemberProfileRepository.save(joinIdolMemberProfile);
+
         // 회원 - 아이돌 카테고리
-        JoinIdol joinIdol = JoinIdol.createJoinIdol(member, artist);
+        JoinIdol joinIdol = JoinIdol.createJoinIdol(member, artist, joinIdolMemberProfile);
         joinIdolRepository.save(joinIdol);
 
         return ResponseEntity.ok().body(new IdolCategoryJoinResponseDTO(artist.getArtist()));
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<JoinIdolCategoryUserInfoDTO> joinIdolUserInfo(String artist, String username) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        JoinIdol findJoinIdol = queryFactory
+                .selectFrom(joinIdol)
+                .where(joinIdol.member.username.eq(username).and(joinIdol.idolCategory.artist.eq(artist)))
+                .fetchOne();
+
+        assert findJoinIdol != null;
+        findJoinIdol.changeIsFirst();
+
+        return ResponseEntity.ok().body(new JoinIdolCategoryUserInfoDTO(findJoinIdol.getNickname(), findJoinIdol.getIsFirst(), findJoinIdol.getJoinIdolMemberProfile().getImgUrl()));
+    }
+
+    @Override
+    public ResponseEntity<List<IdolCategoryResponseDTO>> searchArtistName(String artist, String username) {
+        if (!username.equals(username)) throw new AppException(ErrorCode.NOT_FOUND_USER_ID, "회원을 찾을 수 없습니다.");
+
+        BooleanExpression predicate = idolCategory.artist.containsIgnoreCase(artist);
+
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        List<Tuple> fetch = queryFactory
+                .selectDistinct(
+                        idolCategory.id,
+                        idolCategory.artist,
+                        idolCategory.artistImg,
+                        idolCategory.artistGenre,
+                        idolCategory.artistType,
+                        member.username,
+                        joinIdol.id
+                )
+                .from(idolCategory)
+                .leftJoin(joinIdol)
+                .on(joinIdol.idolCategory.eq(idolCategory)
+                        .and(joinIdol.member.username.eq(username).or(joinIdol.member.isNull())))
+                .leftJoin(member).on(joinIdol.member.eq(member).and(joinIdol.member.username.eq(username)))
+                .where(predicate)
+                .orderBy(
+                        new CaseBuilder()
+                                .when(joinIdol.id.isNotNull()).then(0) // 가입한 카테고리
+                                .otherwise(1) // 가입하지 않은 카테고리
+                                .asc(),
+                        idolCategory.artist.asc()
+                )
+                .fetch();
+
+        for (Tuple tuple : fetch) {
+            System.out.println("tuple = "+tuple);
+        }
+
+        List<IdolCategoryResponseDTO> resultList = fetch.stream()
+                .map(tuple -> new IdolCategoryResponseDTO(
+                        tuple.get(idolCategory.id),
+                        tuple.get(idolCategory.artist),
+                        tuple.get(idolCategory.artistImg),
+                        tuple.get(idolCategory.artistGenre),
+                        tuple.get(idolCategory.artistType),
+                        tuple.get(member.username) != null
+                ))
+                .toList();
+
+        return ResponseEntity.ok().body(resultList);
+    }
+
+    @Override
+    public ResponseEntity<List<IdolCategoryResponseDTO>> searchBeforeLoginArtistName(String artist) {
+        BooleanExpression predicate = idolCategory.artist.containsIgnoreCase(artist);
+
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        List<Tuple> fetch = queryFactory
+                .selectDistinct(
+                        idolCategory.id,
+                        idolCategory.artist,
+                        idolCategory.artistImg,
+                        idolCategory.artistGenre,
+                        idolCategory.artistType
+                )
+                .from(idolCategory)
+                .where(predicate)
+                .orderBy(
+                        idolCategory.artist.asc()
+                )
+                .fetch();
+
+        List<IdolCategoryResponseDTO> resultList = fetch.stream()
+                .map(tuple -> new IdolCategoryResponseDTO(
+                        tuple.get(idolCategory.id),
+                        tuple.get(idolCategory.artist),
+                        tuple.get(idolCategory.artistImg),
+                        tuple.get(idolCategory.artistGenre),
+                        tuple.get(idolCategory.artistType),
+                       null
+                ))
+                .toList();
+
+        return ResponseEntity.ok().body(resultList);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> followUser(String artist, String followUser, String username) {
+        // 해당 카테고리 있는지 확인
+        getIdolCategoryByArtist(artist);
+
+        JoinIdol otherUser = checkJoinMemberByNickname(followUser, artist);
+        JoinIdol user = checkJoinMemberByUsername(username, artist);
+
+        Optional<ArtistFollow> isFollow = artistFollowRepository.findByFollowerNicknameAndFollowingNickname(user.getNickname(), otherUser.getNickname());
+
+        if(isFollow.isPresent()){ // 이미 팔로우한 경우
+            artistFollowRepository.delete(isFollow.get());
+
+            return ResponseEntity.ok("팔로우 취소 성공");
+        }else {
+            ArtistFollow followMember = ArtistFollow.createFollowMember(user, otherUser);
+            artistFollowRepository.save(followMember);
+
+            return ResponseEntity.ok("팔로우 성공");
+        }
+    }
+
+    private void getIdolCategoryByArtist(String artist){
+        idolCategoryRepository.findByArtist(artist).orElseThrow(() -> new AppException(ErrorCode.IDOL_CATEGORY_NOT_FOUND, "아티스트가 존재하지않습니다"));
+    }
+
+    private JoinIdol checkJoinMemberByNickname(String nickname, String artist){
+        return joinIdolRepository.findJoinIdolByNicknameAndIdolCategoryArtist(nickname, artist).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_JOIN_IDOL_CATEGORY, "찾는 회원은 존재하지않는 회원입니다."));
+    }
+
+    private JoinIdol checkJoinMemberByUsername(String username, String artist){
+        return joinIdolRepository.findJoinIdolByMemberUsernameAndIdolCategoryArtist(username, artist).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_JOIN_IDOL_CATEGORY, "존재하지않는 회원입니다."));
     }
 }

@@ -34,6 +34,24 @@ public class S3FileUploadService {
         return saveImg(fullPath, multipartFile, folderKey);
     }
 
+    public String marketBoardStore(String artist, String fullPath, MultipartFile multipartFile, String username) {
+        LocalDate localDate = LocalDate.now();
+        String folderKey = "marketPost/"+artist+"/"+username+"/"+localDate+"/";
+        return saveImg(fullPath, multipartFile, folderKey);
+    }
+
+    public String userProfileStore(String artist, String fullPath, MultipartFile multipartFile, String username) {
+        LocalDate localDate = LocalDate.now();
+        String folderKey = "userProfile/"+artist+"/"+username+"/"+localDate+"/";
+        return saveImg(fullPath, multipartFile, folderKey);
+    }
+
+    public String artistPlaceStore(String artist, String fullPath, MultipartFile multipartFile, String username) {
+        LocalDate localDate = LocalDate.now();
+        String folderKey = "artistPlace/"+artist+"/"+username+"/"+localDate+"/";
+        return saveImg(fullPath, multipartFile, folderKey);
+    }
+
     public String saveSellerImg(String fullPath, MultipartFile multipartFile) {
         String folderKey = "/sellerProfile";
         return saveImg(fullPath, multipartFile, folderKey);
@@ -57,6 +75,11 @@ public class S3FileUploadService {
             }
         }
         return objectKey;
+    }
+
+    public void deleteMissingImages(String delete){
+            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, delete);
+            s3Client.deleteObject(deleteObjectRequest);
     }
 
     public void deleteMissingImages(List<String> deleteList){

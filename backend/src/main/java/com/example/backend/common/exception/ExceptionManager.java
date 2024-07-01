@@ -2,6 +2,7 @@ package com.example.backend.common.exception;
 
 import com.example.backend.common.exception.dto.ErrorDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -43,5 +44,14 @@ public class ExceptionManager {
 
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErrorDTO(HttpStatus.CONFLICT.value(), e.getMessage(), HttpStatus.CONFLICT.getReasonPhrase()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        log.error("Data integrity violation: {}", ex.getMessage());
+
+        // 예외 메시지나 상황에 따라 적절한 응답을 생성
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Data integrity violation", HttpStatus.BAD_REQUEST.getReasonPhrase()));
     }
 }
