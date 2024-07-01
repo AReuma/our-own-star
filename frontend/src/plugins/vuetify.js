@@ -12,7 +12,9 @@ const OurOwnStar = {
         blue: '#3498DB',
         backColor: '#F0F0F0',
         skyblue: '#92C4F4',
-        gray: '#D9D9D9'
+        gray: '#D9D9D9',
+        dateColor: '#868686',
+        black: '#000000',
     }
 }
 

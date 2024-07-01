@@ -1,6 +1,6 @@
 <template>
   <div id="header-layout">
-    <div id="header-title">
+    <div id="header-title" @click="moveHome">
       <span class="text-pink">O</span>ur Own Star
     </div>
     <div id="header-btn">
@@ -60,7 +60,15 @@ export default defineComponent({
       router.push({name: 'RegisterView'})
     },
     logout(){
-
+      VueCookieNext.removeCookie('email');
+      VueCookieNext.removeCookie('role');
+      VueCookieNext.removeCookie('nickname');
+      VueCookieNext.removeCookie('accessToken');
+      VueCookieNext.removeCookie('refreshToken');
+      this.$router.go(0);
+    },
+    moveHome(){
+      router.push({name: 'MainView'})
     }
   },
   mounted() {

@@ -60,7 +60,7 @@
         </v-card-title>
 
         <div style="width: 100%; display: flex; justify-content: center; margin-top: 20px">
-          <input v-model="searchArtist" id="search-box" type="text" @keydown.enter="searchIdol">
+          <input v-model="searchArtist" id="search-box" type="text">
           <v-btn id="search-btn" color="blue" :ripple="false" @click="searchIdol">검색</v-btn>
         </div>
 
@@ -203,7 +203,13 @@ export default defineComponent({
       this.$emit('searchArtist', {artist})
     },
     addArtist(){
-      this.addArtistDialog = true;
+      // 로그인 전에는 로그인
+      if(this.accessToken){
+        this.addArtistDialog = true;
+      } else {
+        alert('로그인이 필요한 서비스 입니다')
+        router.push({name: 'LoginView'})
+      }
     },
     closeArtistDialog(){
       this.addArtistDialog = false;

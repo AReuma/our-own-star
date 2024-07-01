@@ -53,12 +53,13 @@ export default defineComponent({
     ...mapActions(['fetchIdolCategoryJoinIsFirst']),
     post(payload){
       const  {content} = payload;
+      console.log('content: '+ content)
       let artist = this.artist;
 
       axios.post(API_BASE_URL + ARTIST_CATEGORY_BOARD +"/"+ artist, {content}, config)
           .then((res) => {
             console.log(res.data)
-
+            this.$refs.artistPageView.resetPostDialog();
           });
     },
     postImg(formData) {
@@ -68,7 +69,7 @@ export default defineComponent({
       axios.post(API_BASE_URL + ARTIST_CATEGORY_BOARD +"/"+ artist + "/image", formData, imageConfig)
           .then((res) => {
             console.log(res.data)
-            this.$refs.artistPageView.resetPostDialog();
+            //this.$refs.artistPageView.resetPostDialog();
           });
     },
     postVote(payload){
