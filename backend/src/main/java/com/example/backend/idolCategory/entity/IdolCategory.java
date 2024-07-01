@@ -1,14 +1,9 @@
 package com.example.backend.idolCategory.entity;
 
 import com.example.backend.common.TimeStamped;
-import com.example.backend.member.entity.JoinIdol;
 import com.example.backend.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @Builder(toBuilder = true)
@@ -20,6 +15,7 @@ public class IdolCategory extends TimeStamped {
     @Column(name = "idol_category_id")
     private Long id;
 
+    @Column(unique = true)
     private String artist;
 
     private String artistImg;

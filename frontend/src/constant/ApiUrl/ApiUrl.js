@@ -6,3 +6,4 @@ export const NAVER_AUTH_URL = 'http://localhost:7777/api/v1/auth/oauth2/naver'
 export const GOOGLE_AUTH_URL = 'http://localhost:7777/api/v1/auth/oauth2/google'
 
 export const ARTIST_CATEGORY = "/api/v1/idol"
+export const ARTIST_CATEGORY_BOARD = "/api/v1/idol/board"

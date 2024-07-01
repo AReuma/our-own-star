@@ -14,6 +14,13 @@ export default {
   data: () => ({
     //
   }),
+  created() {
+    let token = this.$store.getters.getToken;
+    if(token.accessToken === null && token.refreshToken !== null){
+      //this.$store.dispatch("refreshToken");
+      // accessToken 요청
+    }
+  }
 }
 </script>
 

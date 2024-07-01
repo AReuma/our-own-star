@@ -28,9 +28,27 @@ public class S3FileUploadService {
     private final AmazonS3Client amazonS3Client;
     private final AmazonS3 s3Client;
 
-    public String store(String fullPath, MultipartFile multipartFile, String id) {
+    public String store(String artist, String fullPath, MultipartFile multipartFile, String username) {
         LocalDate localDate = LocalDate.now();
-        String folderKey = "users/"+id+"/"+localDate+"/";
+        String folderKey = "post/"+artist+"/"+username+"/"+localDate+"/";
+        return saveImg(fullPath, multipartFile, folderKey);
+    }
+
+    public String marketBoardStore(String artist, String fullPath, MultipartFile multipartFile, String username) {
+        LocalDate localDate = LocalDate.now();
+        String folderKey = "marketPost/"+artist+"/"+username+"/"+localDate+"/";
+        return saveImg(fullPath, multipartFile, folderKey);
+    }
+
+    public String userProfileStore(String artist, String fullPath, MultipartFile multipartFile, String username) {
+        LocalDate localDate = LocalDate.now();
+        String folderKey = "userProfile/"+artist+"/"+username+"/"+localDate+"/";
+        return saveImg(fullPath, multipartFile, folderKey);
+    }
+
+    public String artistPlaceStore(String artist, String fullPath, MultipartFile multipartFile, String username) {
+        LocalDate localDate = LocalDate.now();
+        String folderKey = "artistPlace/"+artist+"/"+username+"/"+localDate+"/";
         return saveImg(fullPath, multipartFile, folderKey);
     }
 
@@ -44,21 +62,24 @@ public class S3FileUploadService {
         String objectKey = folderKey + fullPath;
 
         File file = new File(MultipartUtil.getLocalHomeDirectory(), fullPath);
+
         try {
             multipartFile.transferTo(file);
             amazonS3Client.putObject(new PutObjectRequest(bucket, objectKey, file)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));    // 권한 설정/ 업로드된 객체에 대해 공개 읽기 액세스 권한을 부여합니다. 즉, 누구나 해당 객체를 읽을 수 있습니다.
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (Exception e) {
             throw new RuntimeException();
         } finally {
             if (file.exists()) {
                 file.delete();
             }
-            // 이미지의 URL 생성
-
-            //return amazonS3Client.getUrl(bucket, objectKey).toString();
         }
         return objectKey;
+    }
+
+    public void deleteMissingImages(String delete){
+            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, delete);
+            s3Client.deleteObject(deleteObjectRequest);
     }
 
     public void deleteMissingImages(List<String> deleteList){

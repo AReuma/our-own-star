@@ -1,6 +1,10 @@
 package com.example.backend.security.jwt.provider;
 
+import com.example.backend.common.exception.AppException;
+import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.member.dto.LoginInfoDto;
+import com.example.backend.member.entity.Member;
+import com.example.backend.member.repository.MemberRepository;
 import com.example.backend.security.jwt.JWTUtil;
 import com.example.backend.security.jwt.token.JwtAuthenticationToken;
 import io.jsonwebtoken.Claims;
@@ -21,6 +25,7 @@ import java.util.List;
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     private final JWTUtil jwtUtil;
+    private final MemberRepository memberRepository;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -34,9 +39,11 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         String username = claims.get("username", String.class);
         String nickname = claims.get("nickname", String.class);
 
+        Member member = memberRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_USER_ID, "회원을 찾을 수 없습니다."));
+
         List<GrantedAuthority> authorities = getGrantedAuthorities(claims);
 
-        return new JwtAuthenticationToken(authorities, new LoginInfoDto(username, nickname), null);
+        return new JwtAuthenticationToken(authorities, new LoginInfoDto(member.getUsername(), member.getNickname()), null);
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(Claims claims){

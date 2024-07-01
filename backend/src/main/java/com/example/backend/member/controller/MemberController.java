@@ -1,8 +1,11 @@
 package com.example.backend.member.controller;
 
+import com.example.backend.artistBoard.dto.PostListResponseDTO;
+import com.example.backend.artistBoard.dto.market.MarketPostListResponseDTO;
 import com.example.backend.common.exception.dto.ErrorDTO;
 import com.example.backend.config.swagger.DisableSwaggerSecurity;
 import com.example.backend.member.dto.*;
+import com.example.backend.member.dto.mypage.UserInfoCommentResponse;
 import com.example.backend.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,7 +18,10 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -68,4 +74,46 @@ public class MemberController {
         log.info("emailCertificationCode");
         return memberService.emailCertificationCode(emailCertificationCodeRequestDTO.getUsername(), emailCertificationCodeRequestDTO.getCode());
     }
+
+    @GetMapping("/getUserInfo/{artist}/{nickname}")
+    public ResponseEntity<OtherUserInfoResponse> getOtherUserInfo(@PathVariable String artist, @PathVariable String nickname, Authentication authentication){
+        log.info("getOtherUserInfo");
+        LoginInfoDto loginInfo = (LoginInfoDto) authentication.getPrincipal();
+        return memberService.getOtherUserInfo(artist, nickname, loginInfo.getUsername());
+    }
+
+    // 회원이 작성한 게시글 전부
+    @GetMapping("/{artist}/{nickname}/board")
+    public ResponseEntity<List<PostListResponseDTO>> getUserInfoBoard(@PathVariable String artist, @PathVariable String nickname, Authentication authentication){
+        log.info("getUserInfo");
+        LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
+        return memberService.getOtherUserInfoBoard(artist, nickname, loginInfoDto.getUsername());
+    }
+
+
+    // 회원이 작성한 댓글
+    @GetMapping("/{artist}/{nickname}/comment")
+    public ResponseEntity<List<UserInfoCommentResponse>> getUserInfoMyComment(@PathVariable String artist, @PathVariable String nickname, Authentication authentication){
+        log.info("getUserInfoMyComment");
+        LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
+        return memberService.getUserInfoMyComment(artist, nickname, loginInfoDto.getUsername());
+    }
+
+
+    // 회원이 좋아요 누른 게시글 전부
+    @GetMapping("/{artist}/{nickname}/like")
+    public ResponseEntity<List<PostListResponseDTO>> getUserInfoMyLike(@PathVariable String artist, @PathVariable String nickname, Authentication authentication){
+        log.info("getUserInfoMyLike");
+        LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
+        return memberService.getUserInfoMyLike(artist, nickname, loginInfoDto.getUsername());
+    }
+
+    // 회원이 좋아요 누른 판매 상품
+    @GetMapping("/{artist}/{nickname}/market")
+    public ResponseEntity<List<MarketPostListResponseDTO>> getUserInfoMyMarket(@PathVariable String artist, @PathVariable String nickname, Authentication authentication){
+        log.info("getUserInfoMyMarket");
+        LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
+        return memberService.getUserInfoMyMarket(artist, nickname, loginInfoDto.getUsername());
+    }
+
 }

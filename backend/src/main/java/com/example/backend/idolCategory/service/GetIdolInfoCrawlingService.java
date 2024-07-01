@@ -27,7 +27,7 @@ public class GetIdolInfoCrawlingService {
         //options.addArguments("--start-maximized");
         options.addArguments("--headless"); // 크롬창 띄우지 않고 실행
 
-        System.setProperty("webdriver.chrome.driver", "/opt/homebrew/bin/chromedriver");
+        System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
 
         WebDriver driver = new ChromeDriver(options);
 
