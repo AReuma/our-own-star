@@ -6,8 +6,13 @@ import OAuthView from "@/views/auth/OAuthView.vue";
 import MainView from "@/views/main/MainView.vue";
 import ArtistView from "@/views/artist/ArtistView.vue";
 import ArtistMarketPageView from "@/components/artist/ArtistMarketPageView.vue";
-import ArtistBookMarkPageView from "@/components/artist/ArtistBookMarkPageView.vue";
 import ArtistPopularPostPageView from "@/components/artist/ArtistPopularPostPageView.vue";
+import ArtistBookMarkPageView from "@/components/artist/ArtistBookMarkPageView.vue";
+import ArtistMyInfoBoardView from "@/components/artist/myPage/ArtistMyInfoBoardView.vue";
+import ArtistMyInfoView from "@/views/artist/myPage/ArtistMyInfoView.vue";
+import ArtistMyInfoCommentView from "@/components/artist/myPage/ArtistMyInfoCommentView.vue";
+import ArtistMyInfoMediaView from "@/components/artist/myPage/ArtistMyInfoMediaView.vue";
+import ArtistMyInfoLikeView from "@/components/artist/myPage/ArtistMyInfoLikeView.vue";
 
 const routes = [
   {
@@ -41,18 +46,51 @@ const routes = [
     name: 'ArtistView',
     component: ArtistView,
     props: true,
+    redirect: { name: 'ArtistMarketPageView' },
     children: [
       {
         path: 'market',
+        name: 'ArtistMarketPageView',
         component: ArtistMarketPageView
       },
       {
         path: 'bookmark',
+        name: 'ArtistBookMarkPageView',
         component: ArtistBookMarkPageView
       },
       {
         path: 'popularPost',
+        name: 'ArtistPopularPostPageView',
         component: ArtistPopularPostPageView
+      },
+      {
+        path: 'myPage',
+        name: 'ArtistMyInfoView',
+        component: ArtistMyInfoView,
+        props: route => ({ artist: route.params.artist }),
+        redirect: {name: 'ArtistMyInfoBoardView'},
+        children: [
+          {
+            path: 'board',
+            name: 'ArtistMyInfoBoardView',
+            component: ArtistMyInfoBoardView
+          },
+          {
+            path: 'comment',
+            name: 'ArtistMyInfoCommentView',
+            component: ArtistMyInfoCommentView
+          },
+          {
+            path: 'media',
+            name: 'ArtistMyInfoMediaView',
+            component: ArtistMyInfoMediaView
+          },
+          {
+            path: 'like',
+            name: 'ArtistMyInfoLikeView',
+            component: ArtistMyInfoLikeView
+          }
+        ]
       }
     ]
   },
