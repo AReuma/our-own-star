@@ -9,7 +9,7 @@ import lombok.*;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class IdolCategory extends TimeStamped {
+public class IdolCategory {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idol_category_id")

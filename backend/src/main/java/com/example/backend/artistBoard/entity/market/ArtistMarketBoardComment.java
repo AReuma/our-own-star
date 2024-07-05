@@ -42,7 +42,7 @@ public class ArtistMarketBoardComment extends TimeStamped {
     private List<ArtistMarketBoardComment> children = new ArrayList<>(); // 자식 댓글들
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "artist_board_id")
+    @JoinColumn(name = "artist_market_board_id")
     private ArtistMarketBoard artistMarketBoard; // 게시글
 
     @Builder.Default

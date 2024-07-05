@@ -10,7 +10,7 @@ import lombok.*;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ArtistBoardCommentBookmark extends TimeStamped {
+public class ArtistBoardCommentBookmark {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -12,7 +12,7 @@ public interface IdolCategoryService {
 
     ResponseEntity<List<IdolCategoryResponseDTO>> getIdolCategory(Integer page);
 
-    ResponseEntity<List<IdolCategoryResponseDTO>> getUserIdolCategory(String username, String username1, Integer page);
+    ResponseEntity<List<IdolCategoryResponseDTO>> getUserIdolCategory(String username, Integer page);
 
     ResponseEntity<Integer> getTotalPage();
 

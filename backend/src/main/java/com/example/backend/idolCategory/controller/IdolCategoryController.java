@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +38,7 @@ public class IdolCategoryController {
             @ApiResponse(responseCode = "404", description = "아티스트 정보를 가져오기 실패", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
     @GetMapping("/search/{artist}")
-    public ResponseEntity<List<IdolCategoryInfoDTO>> getIdolInfo(Authentication authentication, @PathVariable String artist){
+    public ResponseEntity<List<IdolCategoryInfoDTO>> getIdolInfo(Authentication authentication, @PathVariable @Valid @NotBlank String artist){
         log.info("artist: {}", artist);
 
         return getIdolInfoCrawlingService.getIdolInfo(artist);
@@ -81,11 +83,11 @@ public class IdolCategoryController {
             )),
             @ApiResponse(responseCode = "404", description = "회원의 정보가 없음", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
     })
-    @GetMapping("/page/{page}/username/{username}")
-    public ResponseEntity<List<IdolCategoryResponseDTO>> getUserIdolCategory(@PathVariable String username, @PathVariable Integer page, Authentication authentication){
+    @GetMapping("/page/{page}/username")
+    public ResponseEntity<List<IdolCategoryResponseDTO>> getUserIdolCategory(@PathVariable Integer page, Authentication authentication){
         log.info("getUserIdolCategory");
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
-        return idolCategoryService.getUserIdolCategory(username, loginInfoDto.getUsername(), page);
+        return idolCategoryService.getUserIdolCategory(loginInfoDto.getUsername(), page);
     }
 
     @Operation(summary = "아티스트 정보 마지막 페이지 요청", description = "아티스트 마지막 페이지 요청하는 API")
@@ -132,7 +134,7 @@ public class IdolCategoryController {
     }
 
     @PostMapping("/follow/user")
-    public ResponseEntity<String> followUser(@RequestBody FollowUser followUser, Authentication authentication){
+    public ResponseEntity<String> followUser(@RequestBody @Valid FollowUser followUser, Authentication authentication){
         log.info("followUser");
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
         return idolCategoryService.followUser(followUser.getArtist(), followUser.getFollowUser(), loginInfoDto.getUsername());

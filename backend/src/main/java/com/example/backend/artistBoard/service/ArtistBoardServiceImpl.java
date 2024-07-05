@@ -19,10 +19,13 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -68,6 +71,7 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
     private final ArtistMarketCommentBookmarkRepository marketCommentBookmarkRepository;
     private final ArtistPlaceRepository artistPlaceRepository;
     private final RedisVoteService redisVoteService;
+    private final RedisLikeService redisLikeService;
     private final EntityManager em;
 
     private IdolCategory getIdolCategoryByArtist(String artist){
@@ -127,6 +131,10 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
     @Override
     @Transactional
     public ResponseEntity<String> saveVotePost(String artist, String content, List<Map<String, String>> voteChoice, int voteDay, int voteHour, String username) {
+        if (voteChoice.size() > 4){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("투표 선택지는 4개까지 가능합니다.");
+        }
+
         // 카테고리가 존재하는지 확인
         getIdolCategoryByArtist(artist);
 
@@ -138,7 +146,8 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
         artistBoardRepository.save(artistBoard);
 
         LocalDateTime currentTime = LocalDateTime.now();
-        LocalDateTime expiryTime = currentTime.plusDays(voteDay).plusHours(voteHour);
+        //LocalDateTime expiryTime = currentTime.plusDays(voteDay).plusHours(voteHour);
+        LocalDateTime expiryTime = currentTime.plusMinutes(2);
 
         String[] vote = new String[5];
         int count = 0;
@@ -564,16 +573,21 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
         JoinIdol joinIdol = checkJoinMember(username, artist);
 
         ArtistMarketBoard artistMarketBoard = artistMarketBoardRepository.findById(boardId).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_BOARD, "not found board"));
-        Optional<ArtistMarketBoardLike> marketBoardLickCheck = artistMarketBoardLikeRepository.findArtistMarketBoardLikeByArtistMarketBoardIdAndMemberId(boardId, joinIdol.getId());
+        Boolean isCHeck = redisLikeService.marketBoardLike(boardId, joinIdol.getId());
 
-        if(marketBoardLickCheck.isEmpty()){
-            ArtistMarketBoardLike boardLike = ArtistMarketBoardLike.createMarketBoardLike(artistMarketBoard, joinIdol);
-            artistMarketBoardLikeRepository.save(boardLike);
-            return ResponseEntity.ok("좋아요 성공");
+        if (!isCHeck){
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Too many requests - try again later.");
         }else {
-            artistMarketBoard.decreaseLikeCount();
-            artistMarketBoardLikeRepository.delete(marketBoardLickCheck.get());
-            return ResponseEntity.ok("좋아요 취소 성공");
+            Optional<ArtistMarketBoardLike> marketBoardLickCheck = artistMarketBoardLikeRepository.findArtistMarketBoardLikeByArtistMarketBoardIdAndMemberId(boardId, joinIdol.getId());
+            if(marketBoardLickCheck.isEmpty()){
+                ArtistMarketBoardLike boardLike = ArtistMarketBoardLike.createMarketBoardLike(artistMarketBoard, joinIdol);
+                artistMarketBoardLikeRepository.save(boardLike);
+                return ResponseEntity.ok("좋아요 성공");
+            }else {
+                artistMarketBoard.decreaseLikeCount();
+                artistMarketBoardLikeRepository.delete(marketBoardLickCheck.get());
+                return ResponseEntity.ok("좋아요 취소 성공");
+            }
         }
     }
 
@@ -1166,16 +1180,22 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
             expireVote = true;
         }
 
-        // 이미 투표한 회원인지 확인
-        if(redisVoteService.hasVoted(username, String.valueOf(findArtistBoard.getId()))){ // 투표한적이 있음
-            System.out.println("이미 투표한적이 있습니다.");
+        // 투표가 만료되었는지 확인
+        // 투표가 만료되었을 경우 Db에서 가져오기
+        if (expireVote && findArtistBoard.getArtistBoardVote().getSaveVote()){ // 투표 종료 후 db에 저장했으면
+            voteResults = getVoteResults(findArtistBoard.getId());
+        }else { // 투표 진행중이거나 db에 저장되지 않았을때
+            // 이미 투표한 회원인지 확인
             voteResults = redisVoteService.getVoteResults(findArtistBoard.getId());
-            userVoteChoice = redisVoteService.getUserVoteChoice(username, String.valueOf(findArtistBoard.getId()));
-            hasVoted = true;
-        }else { // 투표한적이 없음.
-            System.out.println("이미 투표한 회원이 아닙니다.");
         }
 
+        if(redisVoteService.hasVoted(username, String.valueOf(findArtistBoard.getId()))){ // 투표한적이 있음
+            System.out.println("이미 투표한적이 있습니다.");
+            userVoteChoice = redisVoteService.getUserVoteChoice(username, String.valueOf(findArtistBoard.getId()));
+            hasVoted = true;
+        }else { // 투표한적이 없거나 만료되어서 데이터가 없을경우.
+            System.out.println("이미 투표한 회원이 아닙니다.");
+        }
 
         return Optional.of(new PostVoteResponseDTO(
                 choice,
@@ -1202,5 +1222,44 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
         }
 
         return Optional.of(imageList);
+    }
+
+    public Map<String, String> getVoteResults(Long postId) {
+        ArtistBoardVote findArtistBoardVote = artistBoardVoteRepository.findByArtistBoardId(postId);
+
+        Map<String, String> voteResult = new HashMap<>();
+        int totalVotes = findArtistBoardVote.getResultChoiceCount();
+
+        double percentage1 = (double) findArtistBoardVote.getChoiceCount1() / totalVotes * 100.0;
+        double percentage2 = (double) findArtistBoardVote.getChoiceCount2() / totalVotes * 100.0;
+        double percentage3 = (double) findArtistBoardVote.getChoiceCount3() / totalVotes * 100.0;
+        double percentage4 = (double) findArtistBoardVote.getChoiceCount4() / totalVotes * 100.0;
+
+        if (findArtistBoardVote.getChoice1() != null) {
+            voteResult.put(findArtistBoardVote.getChoice1(), String.valueOf(percentage1));
+        }
+
+        if (findArtistBoardVote.getChoice2() != null) {
+            voteResult.put(findArtistBoardVote.getChoice2(), String.valueOf(percentage2));
+        }
+
+        if (findArtistBoardVote.getChoice3() != null) {
+            voteResult.put(findArtistBoardVote.getChoice3(), String.valueOf(percentage3));
+        }
+
+        if (findArtistBoardVote.getChoice4() != null) {
+            voteResult.put(findArtistBoardVote.getChoice4(), String.valueOf(percentage4));
+        }
+
+        return voteResult;
+    }
+
+    @Transactional
+    @Scheduled(fixedRate = 60000) // 12시간(12 * 60 * 60 * 1000 milliseconds)
+    public void processExpiredVotes() {
+        List<ArtistBoardVote> expiredVotes = artistBoardVoteRepository.findByVoteExpireTimeBeforeAndSaveVote(LocalDateTime.now(), false);
+        for (ArtistBoardVote vote : expiredVotes) {
+            redisVoteService.saveArtistBoardVoteResult(vote.getArtistBoard().getId(), vote.getChoiceTotalCount());
+        }
     }
 }

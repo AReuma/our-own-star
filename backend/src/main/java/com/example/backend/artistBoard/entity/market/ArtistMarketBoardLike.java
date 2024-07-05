@@ -11,7 +11,7 @@ import lombok.*;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ArtistMarketBoardLike extends TimeStamped {
+public class ArtistMarketBoardLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

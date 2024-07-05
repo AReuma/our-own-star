@@ -86,9 +86,9 @@ export default {
                 console.error(res)
             })
     },
-    fetchUserIdolCategory({commit}, {page, username}) {
+    fetchUserIdolCategory({commit}, {page}) {
         let cookie = VueCookieNext.getCookie('accessToken');
-        return axios.get(API_BASE_URL+ARTIST_CATEGORY+"/page/"+page+"/username/"+username, {
+        return axios.get(API_BASE_URL+ARTIST_CATEGORY+"/page/"+page+"/username", {
             headers: {
                 'Authorization': cookie ? 'Bearer ' + cookie : null,
                 'Accept': 'application/json',

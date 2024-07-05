@@ -3,6 +3,7 @@ package com.example.backend.artistBoard.controller;
 import com.example.backend.artistBoard.dto.*;
 import com.example.backend.artistBoard.dto.market.*;
 import com.example.backend.artistBoard.repository.ArtistPlaceResponse;
+import com.example.backend.artistBoard.service.ArtistBoardImageService;
 import com.example.backend.artistBoard.service.ArtistBoardService;
 import com.example.backend.artistBoard.service.RedisVoteService;
 import com.example.backend.common.exception.dto.ErrorDTO;
@@ -14,14 +15,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -32,6 +41,7 @@ public class ArtistBoardController {
 
     private final ArtistBoardService artistBoardService;
     private final RedisVoteService redisVoteService;
+    private final ArtistBoardImageService artistBoardImageService;
 
     @Operation(summary = "게시글 저장", description = "게시글 작성 시 저장하는 API")
     @ApiResponses({
@@ -59,12 +69,13 @@ public class ArtistBoardController {
     public ResponseEntity<String> saveImgPost(@PathVariable String artist,
                                               @RequestPart("content") String content,
                                               @RequestPart("postImg") List<MultipartFile> multipartFile,
-                                              Authentication authentication) {
+                                              Authentication authentication) throws IOException {
         log.info("saveImgPost artis: {}", artist);
 
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
 
-        return artistBoardService.saveImgPost(artist, content, multipartFile, loginInfoDto.getUsername());
+        //return artistBoardService.saveImgPost(artist, content, multipartFile, loginInfoDto.getUsername());
+        return artistBoardImageService.saveImgPost(artist, content, multipartFile, loginInfoDto.getUsername());
     }
 
     @Operation(summary = "투표 포함 게시글 저장", description = "투표 포함된 게시글 작성 시 저장하는 API")
@@ -74,7 +85,7 @@ public class ArtistBoardController {
             @ApiResponse(responseCode = "404", description = "회원이나 작성하려는 아티스트가 존재하지않음", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
     @PostMapping("/{artist}/vote")
-    public ResponseEntity<String> saveVotePost(@PathVariable String artist, @RequestBody SaveVotePostRequestDTO saveVotePostRequestDTO, Authentication authentication) {
+    public ResponseEntity<String> saveVotePost(@PathVariable @Valid @NotBlank String artist, @RequestBody @Valid SaveVotePostRequestDTO saveVotePostRequestDTO, Authentication authentication) {
         log.info("saveVotePost");
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
 
@@ -89,7 +100,7 @@ public class ArtistBoardController {
             @ApiResponse(responseCode = "409", description = "중복 투표 발생함", content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
     })
     @PostMapping("/vote/{boardId}")
-    public ResponseEntity<String> saveVoteResult(@PathVariable Long boardId, Authentication authentication, @RequestBody VoteRequestDTO voteRequestDTO) {
+    public ResponseEntity<String> saveVoteResult(@PathVariable @Valid @Min(value = 0L) Long boardId, Authentication authentication, @RequestBody @Valid VoteRequestDTO voteRequestDTO) {
         log.info("saveVoteResult: 투표 결과 저장 ");
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
         return redisVoteService.addVote(loginInfoDto.getUsername(), boardId, voteRequestDTO.getChoice());
@@ -123,11 +134,12 @@ public class ArtistBoardController {
             @ApiResponse(responseCode = "200", description = "게시글 결과 리턴 성공", content = @Content(schema = @Schema(implementation = LoginResponseDTO.class))),
     })
     @GetMapping("/{artist}/{boardId}")
-    public ResponseEntity<PostResponseDTO> readArtistBoard(@PathVariable String artist, @PathVariable Long boardId, Authentication authentication) {
+    public ResponseEntity<PostResponseDTO> readArtistBoard(@PathVariable String artist, @PathVariable Long boardId, Authentication authentication) throws MalformedURLException {
         log.info("readArtistBoard: " + boardId);
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
 
         return artistBoardService.readArtistBoard(artist, boardId, loginInfoDto.getUsername());
+        //return artistBoardImageService.readArtistBoard(artist, boardId, loginInfoDto.getUsername());
     }
 
     // 댓글 저장
@@ -206,16 +218,21 @@ public class ArtistBoardController {
     })
     @PostMapping("/{artist}/market")
     public ResponseEntity<String> saveMarketPost(@PathVariable String artist,
-                                                 @RequestPart("title") String title,
-                                                 @RequestPart("content") String content,
-                                                 @RequestPart("price") String price,
+                                                 @RequestParam("title") @Valid @NotBlank String title,
+                                                 @RequestParam("content") @Valid @NotBlank String content,
+                                                 @RequestParam("price") @Valid @NotBlank String price,
                                                  @RequestPart("postImg") List<MultipartFile> multipartFile,
-                                                 Authentication authentication) {
-        log.info("market board 저장");
+                                                 Authentication authentication) throws IOException {
+        log.info("market board 저장"+ multipartFile);
+
+        if(multipartFile.isEmpty() ||( multipartFile.size() == 1 && Objects.equals(multipartFile.get(0).getOriginalFilename(), ""))){
+            return ResponseEntity.badRequest().body("postImg is required");
+        }
 
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
 
-        return artistBoardService.saveMarketBoard(title, artist, content, price, multipartFile, loginInfoDto.getUsername());
+        return artistBoardImageService.saveMarketBoard(title, artist, content, price, multipartFile, loginInfoDto.getUsername());
+        //return artistBoardService.saveMarketBoard(title, artist, content, price, multipartFile, loginInfoDto.getUsername());
     }
 
     @Operation(summary = "판매 게시글 전체 페이지 요청", description = "판매 게시글 전체 페이지 수를 요청하는 API")
@@ -243,6 +260,7 @@ public class ArtistBoardController {
         log.info("readMarketPostList");
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
 
+        //return artistBoardImageService.readMarketBoardList(artist, nickname, page, loginInfoDto.getUsername());
         return artistBoardService.readMarketBoardList(artist, nickname, page, loginInfoDto.getUsername());
     }
 
@@ -267,7 +285,7 @@ public class ArtistBoardController {
             @ApiResponse(responseCode = "404", description = "회원이나 해당 아티스트가 존재하지않음", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
     @PostMapping("/{artist}/market/{boardId}/like")
-    public ResponseEntity<String> marketBoardLike(@PathVariable String artist, @PathVariable Long boardId, Authentication authentication) {
+    public ResponseEntity<String> marketBoardLike(@PathVariable @Valid @NotBlank String artist, @PathVariable @Valid @Pattern(regexp = "\\d+") Long boardId, Authentication authentication) {
         log.info("게시글 좋아요");
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
 
@@ -350,6 +368,7 @@ public class ArtistBoardController {
                 title, price, content, deleteImgList, addImgList);
     }
 
+    @Operation(summary = "가장 인기있는 게시글 요청", description = "가장 인기있는 게시글 요청하는 API")
     @GetMapping("/{artist}/getPopularBoard")
     public ResponseEntity<List<PostListResponseDTO>> getPopularBoard(@PathVariable String artist, Authentication authentication){
         log.info("가장 인기있는 게시글 출력하기 ");

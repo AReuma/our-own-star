@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -56,7 +58,9 @@ public class MemberController {
 
     @DisableSwaggerSecurity
     @GetMapping("/checkUsername/{username}")
-    public ResponseEntity<Boolean> checkUsername(@PathVariable @NotBlank String username){
+    public ResponseEntity<Boolean> checkUsername(@PathVariable
+                                                     @NotBlank
+                                                     @Pattern(regexp = "^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\\.[a-zA-Z]{2,3}$", message = "이메일 형식이 아닙니다.") String username){
         log.info("checkUsername");
         return memberService.checkUsername(username);
     }
@@ -73,6 +77,14 @@ public class MemberController {
     public ResponseEntity<Boolean> emailCertificationCode(@RequestBody @Valid EmailCertificationCodeRequestDTO emailCertificationCodeRequestDTO){
         log.info("emailCertificationCode");
         return memberService.emailCertificationCode(emailCertificationCodeRequestDTO.getUsername(), emailCertificationCodeRequestDTO.getCode());
+    }
+
+    @DisableSwaggerSecurity
+    @PostMapping("/refreshToken")///api/v1/users/refreshToken
+    public ResponseEntity<LoginResponseDTO> renewAccessToken(@RequestBody RefreshTokenRequestDTO refreshTokenDto){
+        log.info("renewAccessToken: ");
+
+        return memberService.renewAccessToken(refreshTokenDto.getRefreshToken());
     }
 
     @GetMapping("/getUserInfo/{artist}/{nickname}")

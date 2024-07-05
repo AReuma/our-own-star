@@ -30,4 +30,6 @@ public interface MemberService {
     ResponseEntity<List<PostListResponseDTO>> getUserInfoMyLike(String artist, String nickname, String username);
 
     ResponseEntity<List<MarketPostListResponseDTO>> getUserInfoMyMarket(String artist, String nickname, String username);
+
+    ResponseEntity<LoginResponseDTO> renewAccessToken(String refreshToken);
 }

@@ -72,8 +72,7 @@ export default defineComponent({
     movePage(page){
       console.log(page)
       if (VueCookieNext.isCookieAvailable('accessToken')){
-        const {username} = this;
-        this.fetchUserIdolCategory({page, username})
+        this.fetchUserIdolCategory({page})
       }else {
         this.fetchIdolCategory(page)
       }

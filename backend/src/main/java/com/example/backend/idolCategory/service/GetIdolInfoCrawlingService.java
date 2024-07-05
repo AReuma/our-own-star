@@ -26,6 +26,10 @@ public class GetIdolInfoCrawlingService {
         ChromeOptions options = new ChromeOptions();
         //options.addArguments("--start-maximized");
         options.addArguments("--headless"); // 크롬창 띄우지 않고 실행
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--remote-debugging-port=9222");
 
         System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
 

@@ -21,7 +21,7 @@
                 <p style="margin-left: 20px; font-size: 12px;">{{timeForToday(n.createDate)}}</p>
               </div>
               <div id="content-div">
-                <div>{{n.content}}</div>
+                <div v-html="convertNewLineToBr(n.content)"></div>
                 <div v-if="n.boardType === 'IMAGE'" style="height: auto">
                   <v-carousel
                       height="400"
@@ -136,6 +136,9 @@ export default defineComponent({
   methods: {
     timeForToday,
     ...mapActions(['fetchSearchBoard']),
+    convertNewLineToBr(text) {
+      return text.replace(/\n/g, '<br>');
+    },
     onePostClick(id){
       const artist = this.artist;
       router.push({name: 'ArtistBoardReadView', params: {artist: artist, boardNum: id}})

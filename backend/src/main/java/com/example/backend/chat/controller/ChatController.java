@@ -6,6 +6,7 @@ import com.example.backend.chat.service.RedisChatService;
 import com.example.backend.member.dto.LoginInfoDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -76,7 +77,7 @@ public class ChatController {
     }
 
     @GetMapping("/{artist}/getChatRoomList")
-    public ResponseEntity<List<ChatRoomListResponse>> getChatRoomList(@PathVariable String artist, Authentication authentication){
+    public ResponseEntity<List<ChatRoomListResponse>> getChatRoomList(@PathVariable @Valid @NotBlank String artist, Authentication authentication){
         log.info("getReceiverUserInfo");
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
         return artistChatService.getChatRoomList(artist, loginInfoDto.getUsername());

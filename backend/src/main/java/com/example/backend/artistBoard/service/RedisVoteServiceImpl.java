@@ -1,16 +1,20 @@
 package com.example.backend.artistBoard.service;
 
+import com.example.backend.artistBoard.entity.ArtistBoardVote;
+import com.example.backend.artistBoard.repository.ArtistBoardVoteRepository;
+import com.example.backend.common.exception.AppException;
+import com.example.backend.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,12 +27,14 @@ public class RedisVoteServiceImpl implements RedisVoteService{
     private static final String USER_VOTE_KEY_PREFIX = "userVote:"; // 투표한 사용자 Field
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ArtistBoardVoteRepository artistBoardVoteRepository;
     private final HashOperations<String, String, String> hashOperations;
 
     @Autowired
-    public RedisVoteServiceImpl(RedisTemplate<String, Object> redisTemplate) {
+    public RedisVoteServiceImpl(RedisTemplate<String, Object> redisTemplate, ArtistBoardVoteRepository artistBoardVoteRepository) {
         this.redisTemplate = redisTemplate;
         this.hashOperations = redisTemplate.opsForHash();
+        this.artistBoardVoteRepository = artistBoardVoteRepository;
     }
 
     /**
@@ -100,6 +106,46 @@ public class RedisVoteServiceImpl implements RedisVoteService{
         }
 
         return voteResult;
+    }
+
+    @Override
+    @Transactional
+    public ArtistBoardVote saveArtistBoardVoteResult(Long postId, Integer ChoiceTotalCount) {
+        String userKey = USER_VOTE_KEY_PREFIX + postId;
+        String voteKey = VOTE_RESULTS_KEY_PREFIX + postId;
+
+        Map<String, String> voteInfo = hashOperations.entries(voteKey);
+        Integer[] choiceCount = new Integer[4];
+        Arrays.fill(choiceCount, 0);
+
+        int totalVotes = 0;
+
+        for (String count : voteInfo.values()) {
+            totalVotes += Integer.parseInt(count);
+        }
+
+        int i = 0;
+        for (Map.Entry<String, String> entry : voteInfo.entrySet()) {
+            int count = Integer.parseInt(entry.getValue());
+            choiceCount[i] = count;
+            i++;
+        }
+
+        ArtistBoardVote findArtistBoard = artistBoardVoteRepository.findByArtistBoardId(postId);
+        findArtistBoard.updateResult(choiceCount[0], choiceCount[1], choiceCount[2], choiceCount[3], totalVotes);
+
+        deleteVoteKey(voteKey);
+        deleteUserKey(userKey);
+
+        return findArtistBoard;
+    }
+
+    public void deleteUserKey(String userKey) {
+        redisTemplate.delete(userKey);
+    }
+
+    public void deleteVoteKey(String voteKey) {
+        redisTemplate.delete(voteKey);
     }
 
 }
