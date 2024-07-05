@@ -23,6 +23,7 @@ public enum ErrorCode {
     USER_NOT_JOIN_IDOL_CATEGORY(HttpStatus.FORBIDDEN, ""),
     NOT_FOUND_COMMENT_ID(HttpStatus.NOT_FOUND, ""),
     NOT_FOUND_CHAT_ROOM(HttpStatus.NOT_FOUND, ""),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, ""),
     ;
 
     private final HttpStatus httpStatus;

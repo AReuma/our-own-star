@@ -205,7 +205,7 @@ public class MemberInitDB {
             artistBoardRepository.save(artistBoard12);
 
             // 이미지 게시글
-            ArtistBoard artistBoard7 = ArtistBoard.createArtistBoard("image1, dkfma5@naver.com, ", joinIdol3, BoardType.IMAGE);
+            ArtistBoard artistBoard7 = ArtistBoard.createArtistBoard("이날 무슨 날인지 아는사람?\n왜 경수가 없음?", joinIdol3, BoardType.IMAGE);
             ArtistBoardImage artistBoardImage1 = saveArtistBoardImg("post/카이 (KAI)/dkfma3@naver.com/2024-01-31/images/cd0ff55f-da83-4254-8ff2-481c91a3eefa.jpeg", artistBoard7);
             ArtistBoardImage artistBoardImage2 = saveArtistBoardImg("post/카이 (KAI)/dkfma3@naver.com/2024-01-31/images/5801fe98-e4b7-4208-aaca-7a407fed164e.jpeg", artistBoard7);
             artistBoardImageRepository.save(artistBoardImage1);
@@ -224,9 +224,9 @@ public class MemberInitDB {
             //LocalDateTime expiryTime = currentTime.plusDays(1).plusHours(1);
             LocalDateTime expiryTime = currentTime.plusMinutes(2);
 
-            ArtistBoard artistBoard8 = ArtistBoard.createArtistBoard("vote1, dkfma1@naver.com, ", joinIdol2, BoardType.VOTE);
+            ArtistBoard artistBoard8 = ArtistBoard.createArtistBoard("종인이 닮은 동물은 뭐라고 생가함?", joinIdol2, BoardType.VOTE);
             artistBoardRepository.save(artistBoard8);
-            ArtistBoardVote vote1 = createVote("선택지1", "선택지2", "선택지3", "", 3, artistBoard8, expiryTime);
+            ArtistBoardVote vote1 = createVote("곰돌이🐻", "고양이🐈‍⬛", "트위치🐥", "", 3, artistBoard8, expiryTime);
             artistBoardVoteRepository.save(vote1);
 
             ArtistBoard artistBoard9 = ArtistBoard.createArtistBoard("vote2, dkfma8@naver.com, ", joinIdol7, BoardType.VOTE);

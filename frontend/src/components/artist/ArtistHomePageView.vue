@@ -20,7 +20,7 @@
               <p style="margin-left: 20px; font-size: 12px;">{{timeForToday(n.createDate)}}</p>
             </div>
             <div id="content-div">
-              <div>{{n.content}}</div>
+              <div v-html="convertNewLineToBr(n.content)"></div>
               <div v-if="n.boardType === 'IMAGE'" style="height: auto">
                 <v-carousel
                     height="400"
@@ -54,7 +54,6 @@
               </div>
 
               <div v-if="n.boardType === 'VOTE'">
-                {{n.postVoteResponseDTO.choiceCount}}
                 <v-btn-toggle
                     v-model="toggle"
                     color="pink"
@@ -64,9 +63,7 @@
                   <v-btn :disabled="true" class="ma-1" density="comfortable" variant="text" v-for="(c, index) in n.postVoteResponseDTO.choiceCount" :key="c" :value="index" style="height: 40px; opacity: 1; border: 1px solid hotpink">
                     {{n.postVoteResponseDTO.choice[index]}}
                   </v-btn>
-
                 </v-btn-toggle>
-                {{toggle}}
               </div>
             </div>
             <div id="board-content-btn-list">
@@ -127,6 +124,9 @@ export default defineComponent({
   methods:{
     timeForToday,
     ...mapActions(['fetchIdolCategoryBoard', 'fetchIdolCategoryBoardTotalPage', 'fetchIdolCategoryAddBoard']),
+    convertNewLineToBr(text) {
+      return text.replace(/\n/g, '<br>');
+    },
     onePostClick(id){
       const artist = this.$route.params.artist;
       router.push({name: 'ArtistBoardReadView', params: {artist: artist, boardNum: id}})

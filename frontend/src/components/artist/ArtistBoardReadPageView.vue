@@ -5,7 +5,6 @@
             :joinCategoryUserInfo="joinCategoryUserInfo" :artist="artist"
         ></artist-board-category>
       </div>
-
       <div id="board-content-div">
         <div id="search-div">
          <artist-search-bar :artist="artist"></artist-search-bar>
@@ -75,6 +74,11 @@
                       >
                       </v-carousel-item>
                     </v-carousel>
+
+                    <!--
+                    :src="API_BASE_URL() + slide"
+                    :src="'https://our-own-start-static-files.s3.ap-northeast-2.amazonaws.com/'+slide" -->
+                    {{artistOneBoard.image}}
                   </div>
 
                   <div v-if="artistOneBoard.boardType === 'VOTE'" style="padding-right: 72px">
@@ -273,6 +277,7 @@ import moment from 'moment';
 import router from "@/router";
 import CommentView from "@/components/artist/comment/CommentView.vue";
 import ArtistSearchBar from "@/components/artist/search/ArtistSearchBar.vue";
+import {API_BASE_URL} from "@/constant/ApiUrl/ApiUrl";
 
 export default defineComponent({
   props: ['joinCategoryUserInfo', 'artist', 'artistOneBoard', 'artistBoardComment'],
@@ -301,6 +306,9 @@ export default defineComponent({
     }
   },
   methods: {
+    API_BASE_URL() {
+      return API_BASE_URL
+    },
     addChat(writer){
       let artist = this.artist;
       let messageReceiver = writer;

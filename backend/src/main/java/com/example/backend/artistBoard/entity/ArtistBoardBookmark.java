@@ -17,7 +17,7 @@ public class ArtistBoardBookmark {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
+    @JoinColumn(name = "artist_board_id")
     private ArtistBoard artistBoard;
 
     @ManyToOne(fetch = FetchType.LAZY)

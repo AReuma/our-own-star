@@ -43,6 +43,7 @@ export default defineComponent({
       axios.post(API_BASE_URL+"/api/v1/users/register", {username, password, nickname, phoneNum})
           .then((res) => {
             console.log(res)
+            this.$router.push({name: 'LoginView'})
           })
           .catch((res) => {
             console.error(res)

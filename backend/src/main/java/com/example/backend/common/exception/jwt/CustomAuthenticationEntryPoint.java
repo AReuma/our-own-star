@@ -1,6 +1,9 @@
 package com.example.backend.common.exception.jwt;
 
+import com.example.backend.common.exception.AppException;
+import com.example.backend.common.exception.ErrorCode;
 import com.google.gson.Gson;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +21,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         String exception = (String) request.getAttribute("exception");
+        System.out.println(request);
         log.error("Commence Get Exception : {}", exception);
 
         if(exception == null) {

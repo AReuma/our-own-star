@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ArtistBoardVote extends TimeStamped {
+public class ArtistBoardVote {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "artist_board_vote_id")
@@ -30,6 +30,8 @@ public class ArtistBoardVote extends TimeStamped {
     private int choiceCount2;
     private int choiceCount3;
     private int choiceCount4;
+    private int resultChoiceCount;
+    private Boolean saveVote;
 
     /*@JoinColumn(name = "member_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,6 +53,8 @@ public class ArtistBoardVote extends TimeStamped {
                 .choiceCount2(0)
                 .choiceCount3(0)
                 .choiceCount4(0)
+                .resultChoiceCount(0)
+                .saveVote(Boolean.FALSE)
                 .artistBoard(artistBoard)
                 .voteExpireTime(voteExpireTime)
                 .build();
@@ -58,5 +62,14 @@ public class ArtistBoardVote extends TimeStamped {
         artistBoard.addVote(vote);
 
         return vote;
+    }
+
+    public void updateResult(int choiceCount1, int choiceCount2, int choiceCount3, int choiceCount4, int resultChoiceCount){
+        this.choiceCount1 = choiceCount1;
+        this.choiceCount2 = choiceCount2;
+        this.choiceCount3 = choiceCount3;
+        this.choiceCount4 = choiceCount4;
+        this.resultChoiceCount = resultChoiceCount;
+        this.saveVote = Boolean.TRUE;
     }
 }

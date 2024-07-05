@@ -57,8 +57,8 @@
         <v-card-text style="display: flex; flex: 3; flex-direction: column;">
           <div style="display: flex; width: 100%;">
             <div style="width: auto;">
-              <v-avatar size="60">
-                <v-img src="@/assets/profile/profile-test.jpg"></v-img>
+              <v-avatar max-size="60">
+                <v-img :src="'https://our-own-start-static-files.s3.ap-northeast-2.amazonaws.com/'+joinCategoryUserInfo.userProfileImg"></v-img>
               </v-avatar>
             </div>
             <div class="pl-3" style="flex-grow: 1; width: 100%;">
@@ -148,7 +148,7 @@
           <div style="display: flex; width: 100%;">
             <div style="width: auto;">
               <v-avatar size="60">
-                <v-img src="@/assets/profile/profile-test.jpg"></v-img>
+                <v-img :src="'https://our-own-start-static-files.s3.ap-northeast-2.amazonaws.com/'+joinCategoryUserInfo.userProfileImg"></v-img>
               </v-avatar>
             </div>
             <div class="pl-3" style="flex-grow: 1; width: 100%;">
@@ -284,6 +284,7 @@ export default defineComponent({
           .then((res) => {
             console.log(res.data)
             this.resetPostDialog();
+            window.location.reload()
           });
     },
     postImg(formData){
@@ -292,6 +293,7 @@ export default defineComponent({
           .then((res) => {
             console.log(res.data)
             this.resetPostDialog();
+            window.location.reload()
           });
     },
     postVote(){
@@ -302,6 +304,7 @@ export default defineComponent({
           .then((res) => {
             console.log(res.data)
             this.resetPostDialog();
+            window.location.reload()
           });
     },
     postSellImg(formData){
@@ -310,6 +313,7 @@ export default defineComponent({
           .then((res) => {
             console.log(res.data)
             this.resetPostDialog();
+            window.location.reload()
           });
     },
     saveSellPost() {

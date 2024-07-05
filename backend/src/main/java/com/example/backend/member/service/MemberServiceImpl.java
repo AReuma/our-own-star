@@ -12,10 +12,7 @@ import com.example.backend.artistBoard.repository.market.ArtistMarketBoardLikeRe
 import com.example.backend.common.exception.AppException;
 import com.example.backend.common.exception.ErrorCode;
 import com.example.backend.idolCategory.repository.IdolCategoryRepository;
-import com.example.backend.member.dto.EmailCertificationRequestDTO;
-import com.example.backend.member.dto.EmailCertificationResponseDTO;
-import com.example.backend.member.dto.LoginResponseDTO;
-import com.example.backend.member.dto.OtherUserInfoResponse;
+import com.example.backend.member.dto.*;
 import com.example.backend.member.dto.mypage.UserInfoCommentResponse;
 import com.example.backend.member.entity.Auth;
 import com.example.backend.member.entity.JoinIdol;
@@ -28,11 +25,13 @@ import com.example.backend.security.jwt.JWTUtil;
 import com.example.backend.security.jwt.email.provider.EmailProvider;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -367,6 +366,24 @@ public class MemberServiceImpl implements MemberService{
         }
 
         return ResponseEntity.ok(responseDTOList);
+    }
+
+    @Override
+    public ResponseEntity<LoginResponseDTO> renewAccessToken(String refreshToken) {
+        // refreshToken 만료 확인
+        boolean isExpire = jwtUtil.refreshTokenExpired(refreshToken);
+        if(isExpire){ // 만료됨.
+            // accessToken 새로 발급받아야함.
+            throw new AppException(ErrorCode.EXPIRED_REFRESH_TOKEN, "refreshToken 만료");
+        }else {
+            Claims claims = jwtUtil.parseRefreshToken(refreshToken);
+            String username = claims.get("username", String.class);
+            String nickname = claims.get("nickname", String.class);
+            String role = claims.get("role", String.class);
+            String accessToken = jwtUtil.createAccessToken(username, nickname, role);
+
+            return ResponseEntity.ok(new LoginResponseDTO(accessToken, refreshToken));
+        }
     }
 
     private void getIdolCategoryByArtist(String artist){

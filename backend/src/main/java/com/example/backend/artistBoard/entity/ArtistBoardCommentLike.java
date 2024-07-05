@@ -10,7 +10,7 @@ import lombok.*;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ArtistBoardCommentLike extends TimeStamped {
+public class ArtistBoardCommentLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

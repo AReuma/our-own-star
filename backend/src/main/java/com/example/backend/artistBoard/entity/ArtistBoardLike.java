@@ -10,7 +10,7 @@ import lombok.*;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ArtistBoardLike extends TimeStamped {
+public class ArtistBoardLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +18,7 @@ public class ArtistBoardLike extends TimeStamped {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
+    @JoinColumn(name = "artist_board_id")
     private ArtistBoard artistBoard;
 
     @ManyToOne(fetch = FetchType.LAZY)

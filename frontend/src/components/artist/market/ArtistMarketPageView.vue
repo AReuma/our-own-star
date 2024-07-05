@@ -23,7 +23,10 @@
                    style="position:relative; width: 100%; border-radius: 12px; outline: 1px solid #d9d9d9" height="180">
             <div class="category-profile-image">
               <div style="height: 100%; width: 100%;">
-                <v-img cover="" height="100%" style="background-size: cover; border-top-right-radius: 12px; border-top-left-radius: 12px;" :src="'https://our-own-start-static-files.s3.ap-northeast-2.amazonaws.com/'+board.imgUrl"></v-img>
+                <v-img cover="" height="100%" style="background-size: cover; border-top-right-radius: 12px; border-top-left-radius: 12px;"
+                       :src="'https://our-own-start-static-files.s3.ap-northeast-2.amazonaws.com/'+board.imgUrl"></v-img>
+<!--                <v-img cover="" height="100%" style="background-size: cover; border-top-right-radius: 12px; border-top-left-radius: 12px;"
+                       :src="API_BASE_URL()+board.imgUrl"></v-img>-->
               </div>
             </div>
             <div class="category-name">
@@ -40,7 +43,7 @@
                   가격 미정
                 </div>
                 <div v-else>
-                  ₩ {{board.price}} 원
+                  ₩ {{priceParser(board.price)}} 원
                 </div>
               </div>
             </div>
@@ -71,6 +74,7 @@ import {mapActions, mapState} from "vuex";
 import axios from "axios";
 import {API_BASE_URL, ARTIST_CATEGORY_BOARD} from "@/constant/ApiUrl/ApiUrl";
 import {VueCookieNext} from "vue-cookie-next";
+import {priceParser} from "../../../constant/time/priceParser";
 
 const config = {
   headers: {
@@ -91,7 +95,11 @@ export default defineComponent({
     }
   },
   methods: {
+    priceParser,
     ...mapActions(['fetchIdolCategoryMarketBoard', 'fetchIdolCategoryMarketBoardTotalPage']),
+    API_BASE_URL() {
+      return API_BASE_URL
+    },
     moveSellPage(id){
       const artist = this.artist;
       let sellNum = id;

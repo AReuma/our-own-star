@@ -94,8 +94,8 @@ public class IdolCategoryServiceImpl implements IdolCategoryService{
      * 2. 아티스트 오름차순
      */
     @Override
-    public ResponseEntity<List<IdolCategoryResponseDTO>> getUserIdolCategory(String username, String username1, Integer page) {
-        if (!username.equals(username1)) throw new AppException(ErrorCode.NOT_FOUND_USER_ID, "회원을 찾을 수 없습니다.");
+    public ResponseEntity<List<IdolCategoryResponseDTO>> getUserIdolCategory(String username, Integer page) {
+        //if (!username.equals(username1)) throw new AppException(ErrorCode.NOT_FOUND_USER_ID, "회원을 찾을 수 없습니다.");
 
         //Member member = memberRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_USER_ID, "회원을 찾을 수 없습니다."));
         // select * from idol_category
@@ -128,10 +128,6 @@ public class IdolCategoryServiceImpl implements IdolCategoryService{
                 .offset(4L * (page -1))
                 .limit(4)
                 .fetch();
-
-        for (Tuple tuple : fetch) {
-            System.out.println("tuple = "+tuple);
-        }
 
         List<IdolCategoryResponseDTO> resultList = fetch.stream()
                 .map(tuple -> new IdolCategoryResponseDTO(

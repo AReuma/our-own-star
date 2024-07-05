@@ -58,6 +58,8 @@ public class SecurityConfig {
                         .requestMatchers(new MvcRequestMatcher(introspector, "/v3/api-docs/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/v3/api-docs")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/swagger-ui/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/image/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/users/refreshToken")).permitAll()
                         //.anyRequest().hasAuthority("USER")
                         //.anyRequest().authenticated()
                         .anyRequest().hasRole("USER")

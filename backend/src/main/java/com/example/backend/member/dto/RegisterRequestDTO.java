@@ -19,11 +19,13 @@ public class RegisterRequestDTO {
     private String username;
 
     @NotBlank(message = "PASSWORD cannot be blank")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,}$", message = "비밀번호 형식이 아닙니다.")
     private String password;
 
     @NotBlank(message = "NICKNAME cannot be blank")
     private String nickname;
 
     @NotBlank(message = "PHONENUM cannot be blank")
+    @Pattern(regexp = "^010\\d{8}$", message = "전화번호 형식이 아닙니다")
     private String phoneNum;
 }

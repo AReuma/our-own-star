@@ -14,7 +14,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ArtistMarketBoardCommentLike extends TimeStamped {
+public class ArtistMarketBoardCommentLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
