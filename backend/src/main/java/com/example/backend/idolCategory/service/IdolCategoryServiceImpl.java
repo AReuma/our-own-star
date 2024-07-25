@@ -110,14 +110,14 @@ public class IdolCategoryServiceImpl implements IdolCategoryService{
                         idolCategory.artistImg,
                         idolCategory.artistGenre,
                         idolCategory.artistType,
-                        member.username,
+                       // member.username,
                         joinIdol.id
                 )
                 .from(idolCategory)
                 .leftJoin(joinIdol)
                 .on(joinIdol.idolCategory.eq(idolCategory)
                         .and(joinIdol.member.username.eq(username).or(joinIdol.member.isNull())))
-                .leftJoin(member).on(joinIdol.member.eq(member).and(joinIdol.member.username.eq(username)))
+                //.leftJoin(member).on(joinIdol.member.eq(member).and(joinIdol.member.username.eq(username)))
                 .orderBy(
                         new CaseBuilder()
                                 .when(joinIdol.id.isNotNull()).then(0) // 가입한 카테고리
@@ -136,7 +136,8 @@ public class IdolCategoryServiceImpl implements IdolCategoryService{
                         tuple.get(idolCategory.artistImg),
                         tuple.get(idolCategory.artistGenre),
                         tuple.get(idolCategory.artistType),
-                        tuple.get(member.username) != null
+                        //tuple.get(member.username) != null
+                        tuple.get(joinIdol.id) != null
                 ))
                 .toList();
 

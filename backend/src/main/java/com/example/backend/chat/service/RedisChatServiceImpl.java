@@ -37,7 +37,7 @@ import static com.example.backend.chat.entity.QChatMessage.chatMessage;
 @RequiredArgsConstructor
 public class RedisChatServiceImpl implements RedisChatService{
 
-    private static final int MESSAGE_THRESHOLD = 10;
+    private static final int MESSAGE_THRESHOLD = 100;
     //private static final int REDIS_MAX_MESSAGES = 12;
 
     private final RedisTemplate<String, String> redisTemplate;

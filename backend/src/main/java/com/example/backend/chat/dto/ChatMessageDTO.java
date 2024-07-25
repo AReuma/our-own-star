@@ -26,6 +26,8 @@ public class ChatMessageDTO {
 
     private LocalDateTime creatDate;
 
+    private String artist;
+
     public void setCreatDate(LocalDateTime creatDate) {
         this.creatDate = creatDate;
     }

@@ -32,9 +32,16 @@ public class ChatController {
     @MessageMapping("/sendMessage/{chatRoom}")
     @SendTo("/sub/topic/chat/{chatRoom}")
     public ChatMessageDTO sendMessage(@Payload @Valid ChatMessageDTO message, @DestinationVariable String chatRoom) {
-        // 메시지를 데이터베이스에 저장하거나 다른 로직을 추가할 수 있습니다.
         log.info("chat Test: "+ message.getRoom());
+        //long startTime = System.nanoTime();
         redisChatService.saveMessage(message);
+        //artistChatService.saveMessage(message);
+
+        /*long endTime = System.nanoTime();
+        long duration = endTime - startTime; // 나노초 단위 시간 차이
+
+        System.out.println("Message saving time: " + duration + " nanoseconds");*/
+
         return message;
     }
 
@@ -54,6 +61,7 @@ public class ChatController {
     public ResponseEntity<List<ChatMessageResponse>> getMessage(@PathVariable String artist, @PathVariable String roomId){
         log.info("메세지 가져오기 ");
         return redisChatService.getMessage(roomId);
+        //return artistChatService.getMessage(roomId, artist);
     }
 
     @GetMapping("/{artist}/getOldMsg/{roomId}/{page}")
