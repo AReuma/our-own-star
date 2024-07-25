@@ -74,8 +74,8 @@ public class ArtistBoardController {
 
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
 
-        //return artistBoardService.saveImgPost(artist, content, multipartFile, loginInfoDto.getUsername());
-        return artistBoardImageService.saveImgPost(artist, content, multipartFile, loginInfoDto.getUsername());
+        return artistBoardService.saveImgPost(artist, content, multipartFile, loginInfoDto.getUsername());
+        //return artistBoardImageService.saveImgPost(artist, content, multipartFile, loginInfoDto.getUsername());
     }
 
     @Operation(summary = "투표 포함 게시글 저장", description = "투표 포함된 게시글 작성 시 저장하는 API")
@@ -231,8 +231,8 @@ public class ArtistBoardController {
 
         LoginInfoDto loginInfoDto = (LoginInfoDto) authentication.getPrincipal();
 
-        return artistBoardImageService.saveMarketBoard(title, artist, content, price, multipartFile, loginInfoDto.getUsername());
-        //return artistBoardService.saveMarketBoard(title, artist, content, price, multipartFile, loginInfoDto.getUsername());
+        //return artistBoardImageService.saveMarketBoard(title, artist, content, price, multipartFile, loginInfoDto.getUsername());
+        return artistBoardService.saveMarketBoard(title, artist, content, price, multipartFile, loginInfoDto.getUsername());
     }
 
     @Operation(summary = "판매 게시글 전체 페이지 요청", description = "판매 게시글 전체 페이지 수를 요청하는 API")

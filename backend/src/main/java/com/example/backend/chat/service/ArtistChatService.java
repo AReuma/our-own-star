@@ -1,8 +1,6 @@
 package com.example.backend.chat.service;
 
-import com.example.backend.chat.dto.ChatReceiverUserInfoResponse;
-import com.example.backend.chat.dto.ChatRoomListResponse;
-import com.example.backend.chat.dto.ChatTotalResponse;
+import com.example.backend.chat.dto.*;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -15,4 +13,8 @@ public interface ArtistChatService {
     ResponseEntity<ChatReceiverUserInfoResponse> getReceiverUserInfo(String artist, String roomId, String username);
 
     ResponseEntity<List<ChatRoomListResponse>> getChatRoomList(String artist, String username);
+
+    void saveMessage(ChatMessageDTO message);
+
+    ResponseEntity<List<ChatMessageResponse>> getMessage(String roomId, String artist);
 }

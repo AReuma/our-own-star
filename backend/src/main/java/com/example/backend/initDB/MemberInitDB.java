@@ -376,6 +376,7 @@ public class MemberInitDB {
                     .choice4(choice4)
                     .choiceTotalCount(choiceCount)
                     .artistBoard(artistBoard)
+                    .saveVote(Boolean.FALSE)
                     .voteExpireTime(voteExpireTime)
                     .build();
 

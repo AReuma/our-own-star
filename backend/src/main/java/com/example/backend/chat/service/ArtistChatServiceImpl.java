@@ -1,10 +1,9 @@
 package com.example.backend.chat.service;
 
-import com.example.backend.chat.dto.ChatReceiverUserInfoResponse;
-import com.example.backend.chat.dto.ChatRoomListResponse;
-import com.example.backend.chat.dto.ChatTotalResponse;
+import com.example.backend.chat.dto.*;
 import com.example.backend.chat.entity.ChatMessage;
 import com.example.backend.chat.entity.ChatRoom;
+import com.example.backend.chat.repository.ChatMessageRepository;
 import com.example.backend.chat.repository.ChatRoomRepository;
 import com.example.backend.common.exception.AppException;
 import com.example.backend.common.exception.ErrorCode;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
 import static com.example.backend.chat.entity.QChatMessage.chatMessage;
@@ -34,6 +34,7 @@ import static com.example.backend.chat.entity.QChatRoom.chatRoom;
 public class ArtistChatServiceImpl implements ArtistChatService{
 
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final IdolCategoryRepository idolCategoryRepository;
     private final JoinIdolRepository joinIdolRepository;
     private final RedisChatService redisChatService;
@@ -183,6 +184,47 @@ public class ArtistChatServiceImpl implements ArtistChatService{
         response.sort(Comparator.comparing(ChatRoomListResponse::getCreatedDate).reversed());
 
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @Transactional
+    public void saveMessage(ChatMessageDTO message) {
+        // 카테고리가 존재하는지 확인
+        getIdolCategoryByArtist(message.getArtist());
+
+        // 카테고리에 가입된 회원인지 확인
+        JoinIdol sender = checkJoinMemberWithNickname(message.getSender(), message.getArtist());
+
+        ChatRoom findChatRoom = chatRoomRepository.findChatRoomByRoomId(message.getRoom()).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_CHAT_ROOM, "Chat room not found"));
+
+        LocalDateTime nowInSeoul = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        message.setCreatDate(nowInSeoul);
+
+        long timestamp = nowInSeoul.toInstant(ZoneOffset.ofHours(9)).toEpochMilli();
+
+        ChatMessage chatMessageEntity = ChatMessage.createChatMessage(sender, findChatRoom, message.getContent(), timestamp);
+        chatMessageRepository.save(chatMessageEntity);
+    }
+
+    @Override
+    public ResponseEntity<List<ChatMessageResponse>> getMessage(String roomId, String artist) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        List<ChatMessage> fetch = queryFactory.selectFrom(chatMessage)
+                .where(chatMessage.chatRoom.roomId.eq(roomId))
+                .orderBy(chatMessage.createDate.asc())
+                .fetch();
+
+        List<ChatMessageResponse> responses = new ArrayList<>();
+        for (ChatMessage message : fetch) {
+            Instant instant = Instant.ofEpochMilli(message.getCreateDate());
+            LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("Asia/Seoul"));
+            ChatMessageResponse chatMessageResponse = new ChatMessageResponse(message.getMessageSender().getNickname(), message.getMessageSender().getJoinIdolMemberProfile().getImgUrl(),
+                    message.getMessage(), localDateTime, message.getCreateDate());
+
+            responses.add(chatMessageResponse);
+        }
+
+        return ResponseEntity.ok(responses);
     }
 
     public LocalDateTime instantTimeToLocalDateTime(Long instantTime){

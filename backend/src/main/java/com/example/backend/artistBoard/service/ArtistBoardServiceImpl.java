@@ -1231,9 +1231,13 @@ public class ArtistBoardServiceImpl implements ArtistBoardService {
         int totalVotes = findArtistBoardVote.getResultChoiceCount();
 
         double percentage1 = (double) findArtistBoardVote.getChoiceCount1() / totalVotes * 100.0;
+        percentage1 = Math.round(percentage1 * 100.0) / 100.0;
         double percentage2 = (double) findArtistBoardVote.getChoiceCount2() / totalVotes * 100.0;
+        percentage2 = Math.round(percentage2 * 100.0) / 100.0;
         double percentage3 = (double) findArtistBoardVote.getChoiceCount3() / totalVotes * 100.0;
+        percentage3 = Math.round(percentage3 * 100.0) / 100.0;
         double percentage4 = (double) findArtistBoardVote.getChoiceCount4() / totalVotes * 100.0;
+        percentage4 = Math.round(percentage4 * 100.0) / 100.0;
 
         if (findArtistBoardVote.getChoice1() != null) {
             voteResult.put(findArtistBoardVote.getChoice1(), String.valueOf(percentage1));
